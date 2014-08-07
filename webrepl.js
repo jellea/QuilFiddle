@@ -1,0 +1,17 @@
+replgoog.addDependency("base.js", ['replgoog'], []);
+replgoog.addDependency("../cljs/core.js", ['cljs.core'], ['replgoog.string', 'replgoog.array', 'replgoog.object', 'replgoog.string.StringBuffer']);
+replgoog.addDependency("../clojure/string.js", ['clojure.string'], ['cljs.core', 'replgoog.string', 'replgoog.string.StringBuffer']);
+replgoog.addDependency("../cljs/analyzer.js", ['cljs.analyzer'], ['cljs.core', 'clojure.string']);
+replgoog.addDependency("../cljs/io.js", ['cljs.io'], ['cljs.core']);
+replgoog.addDependency("../cljs/reader.js", ['cljs.reader'], ['cljs.analyzer', 'cljs.core', 'replgoog.string', 'clojure.string']);
+replgoog.addDependency("../cljs/compiler.js", ['cljs.compiler'], ['cljs.io', 'cljs.analyzer', 'cljs.core', 'clojure.string', 'cljs.reader']);
+replgoog.addDependency("../cljs/repl.js", ['cljs.repl'], ['cljs.analyzer', 'cljs.compiler', 'cljs.core', 'cljs.reader']);
+replgoog.addDependency("../clojure/browser/dom.js", ['clojure.browser.dom'], ['replgoog.dom', 'cljs.core', 'replgoog.object']);
+replgoog.addDependency("../quil/middlewares/deprecated_options.js", ['quil.middlewares.deprecated_options'], ['cljs.core']);
+replgoog.addDependency("../quil/util.js", ['quil.util'], ['cljs.core']);
+replgoog.addDependency("../quil/sketch.js", ['quil.sketch'], ['cljs.core', 'clojure.browser.dom', 'quil.middlewares.deprecated_options', 'quil.util']);
+replgoog.addDependency("../quil/core.js", ['quil.core'], ['quil.sketch', 'cljs.core', 'clojure.browser.dom', 'clojure.string', 'quil.util']);
+replgoog.addDependency("../quil/middlewares/navigation_3d.js", ['quil.middlewares.navigation_3d'], ['cljs.core', 'quil.core']);
+replgoog.addDependency("../quil/middlewares/fun_mode.js", ['quil.middlewares.fun_mode'], ['cljs.core', 'quil.core']);
+replgoog.addDependency("../quil/middleware.js", ['quil.middleware'], ['cljs.core', 'quil.middlewares.navigation_3d', 'quil.middlewares.fun_mode']);
+replgoog.addDependency("../GacXI.js", ['repl'], ['cljs.core', 'quil.core','quil.middleware', 'cljs.repl']);

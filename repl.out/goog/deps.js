@@ -1,0 +1,18 @@
+replgoog.addDependency("string/string.js", ['replgoog.string', 'replgoog.string.Unicode'], []);
+replgoog.addDependency("object/object.js", ['replgoog.object'], []);
+replgoog.addDependency("string/stringbuffer.js", ['replgoog.string.StringBuffer'], []);
+replgoog.addDependency("debug/error.js", ['replgoog.debug.Error'], []);
+replgoog.addDependency("dom/nodetype.js", ['replgoog.dom.NodeType'], []);
+replgoog.addDependency("asserts/asserts.js", ['replgoog.asserts', 'replgoog.asserts.AssertionError'], ['replgoog.debug.Error', 'replgoog.dom.NodeType', 'replgoog.string']);
+replgoog.addDependency("array/array.js", ['replgoog.array', 'replgoog.array.ArrayLike'], ['replgoog.asserts']);
+replgoog.addDependency("labs/useragent/util.js", ['replgoog.labs.userAgent.util'], ['replgoog.string']);
+replgoog.addDependency("labs/useragent/browser.js", ['replgoog.labs.userAgent.browser'], ['replgoog.array', 'replgoog.asserts', 'replgoog.labs.userAgent.util', 'replgoog.string']);
+replgoog.addDependency("labs/useragent/engine.js", ['replgoog.labs.userAgent.engine'], ['replgoog.array', 'replgoog.labs.userAgent.util', 'replgoog.string']);
+replgoog.addDependency("useragent/useragent.js", ['replgoog.userAgent'], ['replgoog.labs.userAgent.browser', 'replgoog.labs.userAgent.engine', 'replgoog.labs.userAgent.util', 'replgoog.string']);
+replgoog.addDependency("dom/browserfeature.js", ['replgoog.dom.BrowserFeature'], ['replgoog.userAgent']);
+replgoog.addDependency("math/math.js", ['replgoog.math'], ['replgoog.array', 'replgoog.asserts']);
+replgoog.addDependency("dom/tagname.js", ['replgoog.dom.TagName'], []);
+replgoog.addDependency("functions/functions.js", ['replgoog.functions'], []);
+replgoog.addDependency("math/coordinate.js", ['replgoog.math.Coordinate'], ['replgoog.math']);
+replgoog.addDependency("math/size.js", ['replgoog.math.Size'], []);
+replgoog.addDependency("dom/dom.js", ['replgoog.dom', 'replgoog.dom.Appendable', 'replgoog.dom.DomHelper'], ['replgoog.array', 'replgoog.asserts', 'replgoog.dom.BrowserFeature', 'replgoog.dom.NodeType', 'replgoog.dom.TagName', 'replgoog.functions', 'replgoog.math.Coordinate', 'replgoog.math.Size', 'replgoog.object', 'replgoog.string', 'replgoog.userAgent']);

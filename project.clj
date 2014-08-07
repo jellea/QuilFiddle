@@ -22,4 +22,4 @@
               :optimizations :none
               :source-map true
               }
-             :notify-command ["make" "build-repl"]}]})
+             }]})
