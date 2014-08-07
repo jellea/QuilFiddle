@@ -1,0 +1,41 @@
+* {box-sizing: border-box}
+
+::selection {
+  background: #ffb7b7; /* WebKit/Blink Browsers */
+}
+::-moz-selection {
+  background: #ffb7b7; /* Gecko Browsers */
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.CodeMirror {
+  font-family: 'Source Code Pro', monospace !important;
+  font-size: 0.9em;
+  line-height: 1.5em !important;
+  font-rendering: optimizeLegibility;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  height: 100vh !important;
+  min-width: 500px;
+  max-width: 40vw;
+  transform: translate(-1rem, 0px);
+  transition: all 0.2s cubic-bezier(.06,1,.93,1);
+  padding: 2rem;
+  opacity: 0.3;
+  z-index: 10;
+}
+
+.CodeMirror:hover {
+  opacity: 0.95;
+  transform: translate(0px, 0px);
+}
+
+#quilfiddle {
+  z-index: -10;
+}
