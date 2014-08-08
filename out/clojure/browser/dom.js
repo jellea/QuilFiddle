@@ -17,16 +17,16 @@ var children = null;if (arguments.length > 1) {
   children = cljs.core.array_seq(Array.prototype.slice.call(arguments, 1),0);} 
 return append__delegate.call(this,parent,children);};
 append.cljs$lang$maxFixedArity = 1;
-append.cljs$lang$applyTo = (function (arglist__10579){
-var parent = cljs.core.first(arglist__10579);
-var children = cljs.core.rest(arglist__10579);
+append.cljs$lang$applyTo = (function (arglist__11068){
+var parent = cljs.core.first(arglist__11068);
+var children = cljs.core.rest(arglist__11068);
 return append__delegate(parent,children);
 });
 append.cljs$core$IFn$_invoke$arity$variadic = append__delegate;
 return append;
 })()
 ;
-clojure.browser.dom.DOMBuilder = (function (){var obj10581 = {};return obj10581;
+clojure.browser.dom.DOMBuilder = (function (){var obj11070 = {};return obj11070;
 })();
 clojure.browser.dom._element = (function() {
 var _element = null;
@@ -118,8 +118,8 @@ var args = null;if (arguments.length > 0) {
   args = cljs.core.array_seq(Array.prototype.slice.call(arguments, 0),0);} 
 return log__delegate.call(this,args);};
 log.cljs$lang$maxFixedArity = 0;
-log.cljs$lang$applyTo = (function (arglist__10582){
-var args = cljs.core.seq(arglist__10582);
+log.cljs$lang$applyTo = (function (arglist__11071){
+var args = cljs.core.seq(arglist__11071);
 return log__delegate(args);
 });
 log.cljs$core$IFn$_invoke$arity$variadic = log__delegate;
@@ -142,8 +142,8 @@ var tag = cljs.core.first.call(null,this$__$1);var attrs = cljs.core.second.call
 });
 (clojure.browser.dom.DOMBuilder["string"] = true);
 (clojure.browser.dom._element["string"] = (function() {
-var G__10590 = null;
-var G__10590__1 = (function (this$){clojure.browser.dom.log.call(null,"string (-element ",this$,")");
+var G__11079 = null;
+var G__11079__1 = (function (this$){clojure.browser.dom.log.call(null,"string (-element ",this$,")");
 if((this$ instanceof cljs.core.Keyword))
 {return goog.dom.createElement(cljs.core.name.call(null,this$));
 } else
@@ -154,25 +154,25 @@ if((this$ instanceof cljs.core.Keyword))
 }
 }
 });
-var G__10590__2 = (function (this$,attrs_or_children){clojure.browser.dom.log.call(null,"string (-element ",this$," ",attrs_or_children,")");
+var G__11079__2 = (function (this$,attrs_or_children){clojure.browser.dom.log.call(null,"string (-element ",this$," ",attrs_or_children,")");
 var attrs = cljs.core.first.call(null,attrs_or_children);if(cljs.core.map_QMARK_.call(null,attrs))
 {return clojure.browser.dom._element.call(null,this$,attrs,cljs.core.rest.call(null,attrs_or_children));
 } else
 {return clojure.browser.dom._element.call(null,this$,null,attrs_or_children);
 }
 });
-var G__10590__3 = (function (this$,attrs,children){clojure.browser.dom.log.call(null,"string (-element ",this$," ",attrs," ",children,")");
-var str_attrs = (((cljs.core.map_QMARK_.call(null,attrs)) && (cljs.core.seq.call(null,attrs)))?cljs.core.reduce.call(null,(function (o,p__10583){var vec__10584 = p__10583;var k = cljs.core.nth.call(null,vec__10584,(0),null);var v = cljs.core.nth.call(null,vec__10584,(1),null);var o__$1 = (((o == null))?(function (){var obj10586 = {};return obj10586;
+var G__11079__3 = (function (this$,attrs,children){clojure.browser.dom.log.call(null,"string (-element ",this$," ",attrs," ",children,")");
+var str_attrs = (((cljs.core.map_QMARK_.call(null,attrs)) && (cljs.core.seq.call(null,attrs)))?cljs.core.reduce.call(null,(function (o,p__11072){var vec__11073 = p__11072;var k = cljs.core.nth.call(null,vec__11073,(0),null);var v = cljs.core.nth.call(null,vec__11073,(1),null);var o__$1 = (((o == null))?(function (){var obj11075 = {};return obj11075;
 })():o);clojure.browser.dom.log.call(null,"o = ",o__$1);
 clojure.browser.dom.log.call(null,"k = ",k);
 clojure.browser.dom.log.call(null,"v = ",v);
 if(((k instanceof cljs.core.Keyword)) || (typeof k === 'string'))
-{var G__10587 = o__$1;(G__10587[cljs.core.name.call(null,k)] = v);
-return G__10587;
+{var G__11076 = o__$1;(G__11076[cljs.core.name.call(null,k)] = v);
+return G__11076;
 } else
 {return null;
 }
-}),(function (){var obj10589 = {};return obj10589;
+}),(function (){var obj11078 = {};return obj11078;
 })(),attrs):null);clojure.browser.dom.log_obj.call(null,str_attrs);
 if(cljs.core.seq.call(null,children))
 {return cljs.core.apply.call(null,goog.dom.createDom,cljs.core.name.call(null,this$),str_attrs,cljs.core.map.call(null,clojure.browser.dom._element,children));
@@ -180,18 +180,18 @@ if(cljs.core.seq.call(null,children))
 {return goog.dom.createDom(cljs.core.name.call(null,this$),str_attrs);
 }
 });
-G__10590 = function(this$,attrs,children){
+G__11079 = function(this$,attrs,children){
 switch(arguments.length){
 case 1:
-return G__10590__1.call(this,this$);
+return G__11079__1.call(this,this$);
 case 2:
-return G__10590__2.call(this,this$,attrs);
+return G__11079__2.call(this,this$,attrs);
 case 3:
-return G__10590__3.call(this,this$,attrs,children);
+return G__11079__3.call(this,this$,attrs,children);
 }
 throw(new Error('Invalid arity: ' + arguments.length));
 };
-return G__10590;
+return G__11079;
 })()
 );
 /**
@@ -203,25 +203,25 @@ var element__1 = (function (tag_or_text){clojure.browser.dom.log.call(null,"(ele
 return clojure.browser.dom._element.call(null,tag_or_text);
 });
 var element__2 = (function() { 
-var G__10591__delegate = function (tag,children){clojure.browser.dom.log.call(null,"(element ",tag," ",children,")");
+var G__11080__delegate = function (tag,children){clojure.browser.dom.log.call(null,"(element ",tag," ",children,")");
 var attrs = cljs.core.first.call(null,children);if(cljs.core.map_QMARK_.call(null,attrs))
 {return clojure.browser.dom._element.call(null,tag,attrs,cljs.core.rest.call(null,children));
 } else
 {return clojure.browser.dom._element.call(null,tag,null,children);
 }
 };
-var G__10591 = function (tag,var_args){
+var G__11080 = function (tag,var_args){
 var children = null;if (arguments.length > 1) {
   children = cljs.core.array_seq(Array.prototype.slice.call(arguments, 1),0);} 
-return G__10591__delegate.call(this,tag,children);};
-G__10591.cljs$lang$maxFixedArity = 1;
-G__10591.cljs$lang$applyTo = (function (arglist__10592){
-var tag = cljs.core.first(arglist__10592);
-var children = cljs.core.rest(arglist__10592);
-return G__10591__delegate(tag,children);
+return G__11080__delegate.call(this,tag,children);};
+G__11080.cljs$lang$maxFixedArity = 1;
+G__11080.cljs$lang$applyTo = (function (arglist__11081){
+var tag = cljs.core.first(arglist__11081);
+var children = cljs.core.rest(arglist__11081);
+return G__11080__delegate(tag,children);
 });
-G__10591.cljs$core$IFn$_invoke$arity$variadic = G__10591__delegate;
-return G__10591;
+G__11080.cljs$core$IFn$_invoke$arity$variadic = G__11080__delegate;
+return G__11080;
 })()
 ;
 element = function(tag,var_args){

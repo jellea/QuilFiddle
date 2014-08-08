@@ -1,9 +1,11 @@
 ; Original version: https://github.com/lazerwalker/clojurescript-koans/blob/master/src/koans/repl.cljs
 
 (ns quilfiddle.repl
-  (:require [cljs.core.async :as async
+  (:require [quil.core :as q]
+            [cljs.core.async :as async
     :refer [<! >! chan close! sliding-buffer put! alts! timeout]])
-  (:require-macros [cljs.core.async.macros :refer [go alt!]]))
+  (:require-macros [quil.core :refer [defsketch sketch]]
+                   [cljs.core.async.macros :refer [go alt!]]))
 
 (def output-chan (chan))
 (def error-chan (chan))

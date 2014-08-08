@@ -6,35 +6,42 @@
 
 (enable-console-print!)
 
-(def default-code "(defn setup []
-  (quil.core/hint :enable-retina-pixels)
-  (quil.core/frame-rate 30)
-  (quil.core/color-mode :hsb)
-  {:color 0
-   :angle 0})
+(def default-code "(def min-r 10)
+
+(defn setup []
+  ; initial state
+  {:x 0 :y 0 :r min-r})
 
 (defn update [state]
-  (let [{:keys [color angle]} state]
-    {:color (mod (+ color 0.7) 255)
-     :angle (mod (+ angle 0.1) quil.core/TWO-PI)}))
+  ; increase radius of the circle by 1 on each frame
+  (update-in state [:r] inc))
 
 (defn draw [state]
   (quil.core/background 255)
-  (quil.core/fill (:color state) 255 255)
-  (let [angle (:angle state)
-        x (* 150 (quil.core/cos angle))
-        y (* 150 (quil.core/sin angle))]
-    (quil.core/with-translation [(/ (quil.core/width) 2)
-                         (/ (quil.core/height) 2)]
-      (quil.core/ellipse x y 100 100))))
+  (quil.core/ellipse (:x state) (:y state) (:r state) (:r state)))
+
+; decrease radius by 1 but keeping it not less than min-r
+(defn shrink [r]
+  (max min-r (dec r)))
+
+(defn mouse-moved [state event]
+  (-> state
+      ; set circle position to mouse position
+      (assoc :x (:x event) :y (:y event))
+      ; decrease radius
+      (update-in [:r] shrink)))
 
 (defn my-sketch []
   (quil.core/sketch
     :host \"canvas\"
-    :size [500 500]
+    :size [1000 1000]
     :setup setup
+    :draw draw
     :update update
-    :draw draw))")
+    :mouse-moved mouse-moved
+    :middleware [quil.middleware/fun-mode]))
+
+(my-sketch)")
 
 (defn eval-code [cm]
   (let [doc (.-doc cm)]
@@ -57,34 +64,43 @@
 
 (repl/listen-for-output prn)
 
-(repl/eval default-code)
+;(repl/eval default-code)
 
-;(defn setup []
-  ;(q/hint :enable-retina-pixels)
-  ;(q/frame-rate 30)
-  ;(q/color-mode :hsb)
-  ;{:color 0
-   ;:angle 0})
+; Cheating... ;)
 
-;(defn update [state]
-  ;(let [{:keys [color angle]} state]
-    ;{:color (mod (+ color 0.7) 255)
-     ;:angle (mod (+ angle 0.1) q/TWO-PI)}))
+(def min-r 10)
 
-;(defn draw [state]
-  ;(q/background 255)
-  ;(q/fill (:color state) 255 255)
-  ;(let [angle (:angle state)
-        ;x (* 150 (q/cos angle))
-        ;y (* 150 (q/sin angle))]
-    ;(q/with-translation [(/ (q/width) 2)
-                         ;(/ (q/height) 2)]
-      ;(q/ellipse x y 100 100))))
+(defn setup []
+  ; initial state
+  {:x 0 :y 0 :r min-r})
 
-;(q/defsketch quilfiddle
-  ;:host "quilfiddle"
-  ;:size [(.-innerWidth js/window) (.-innerHeight js/window)]
-  ;:setup setup
-  ;:update update
-  ;:draw draw
-  ;:middleware [m/fun-mode])
+(defn update [state]
+  ; increase radius of the circle by 1 on each frame
+  (update-in state [:r] inc))
+
+(defn draw [state]
+  (q/background 255)
+  (q/ellipse (:x state) (:y state) (:r state) (:r state)))
+
+; decrease radius by 1 but keeping it not less than min-r
+(defn shrink [r]
+  (max min-r (dec r)))
+
+(defn mouse-moved [state event]
+  (-> state
+      ; set circle position to mouse position
+      (assoc :x (:x event) :y (:y event))
+      ; decrease radius
+      (update-in [:r] shrink)))
+
+(defn my-sketch []
+  (q/sketch
+    :host "canvas"
+    :size [(.-innerWidth js/window) (.-innerHeight js/window)]
+    :setup setup
+    :draw draw
+    :update update
+    :mouse-moved mouse-moved
+    :middleware [quil.middleware/fun-mode]))
+
+(my-sketch)

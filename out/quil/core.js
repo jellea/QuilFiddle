@@ -139,8 +139,8 @@ var state_vals = null;if (arguments.length > 0) {
   state_vals = cljs.core.array_seq(Array.prototype.slice.call(arguments, 0),0);} 
 return set_state_BANG___delegate.call(this,state_vals);};
 set_state_BANG_.cljs$lang$maxFixedArity = 0;
-set_state_BANG_.cljs$lang$applyTo = (function (arglist__10524){
-var state_vals = cljs.core.seq(arglist__10524);
+set_state_BANG_.cljs$lang$applyTo = (function (arglist__11013){
+var state_vals = cljs.core.seq(arglist__11013);
 return set_state_BANG___delegate(state_vals);
 });
 set_state_BANG_.cljs$core$IFn$_invoke$arity$variadic = set_state_BANG___delegate;
@@ -684,7 +684,7 @@ return blend;
 * lights. Called "Color Burn" in Illustrator and
 * Photoshop.
 */
-quil.core.blend_color = (function blend_color(c1,c2,mode){var mode_10525__$1 = quil.util.resolve_constant_key.call(null,mode,quil.core.blend_modes);return quil.core.current_graphics.call(null).blendColor(c1,c2,mode);
+quil.core.blend_color = (function blend_color(c1,c2,mode){var mode_11014__$1 = quil.util.resolve_constant_key.call(null,mode,quil.core.blend_modes);return quil.core.current_graphics.call(null).blendColor(c1,c2,mode);
 });
 /**
 * Extracts the blue value from a color, scaled to match current color-mode.
@@ -868,20 +868,20 @@ quil.core.constrain = (function constrain(amt,low,high){return quil.sketch.curre
 */
 quil.core.copy = (function() {
 var copy = null;
-var copy__2 = (function (p__10526,p__10527){var vec__10538 = p__10526;var sx = cljs.core.nth.call(null,vec__10538,(0),null);var sy = cljs.core.nth.call(null,vec__10538,(1),null);var swidth = cljs.core.nth.call(null,vec__10538,(2),null);var sheight = cljs.core.nth.call(null,vec__10538,(3),null);var vec__10539 = p__10527;var dx = cljs.core.nth.call(null,vec__10539,(0),null);var dy = cljs.core.nth.call(null,vec__10539,(1),null);var dwidth = cljs.core.nth.call(null,vec__10539,(2),null);var dheight = cljs.core.nth.call(null,vec__10539,(3),null);return copy.call(null,quil.core.current_graphics.call(null),quil.core.current_graphics.call(null),new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [sx,sy,swidth,sheight], null),new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [dx,dy,dwidth,dheight], null));
+var copy__2 = (function (p__11015,p__11016){var vec__11027 = p__11015;var sx = cljs.core.nth.call(null,vec__11027,(0),null);var sy = cljs.core.nth.call(null,vec__11027,(1),null);var swidth = cljs.core.nth.call(null,vec__11027,(2),null);var sheight = cljs.core.nth.call(null,vec__11027,(3),null);var vec__11028 = p__11016;var dx = cljs.core.nth.call(null,vec__11028,(0),null);var dy = cljs.core.nth.call(null,vec__11028,(1),null);var dwidth = cljs.core.nth.call(null,vec__11028,(2),null);var dheight = cljs.core.nth.call(null,vec__11028,(3),null);return copy.call(null,quil.core.current_graphics.call(null),quil.core.current_graphics.call(null),new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [sx,sy,swidth,sheight], null),new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [dx,dy,dwidth,dheight], null));
 });
-var copy__3 = (function (src_img,p__10528,p__10529){var vec__10540 = p__10528;var sx = cljs.core.nth.call(null,vec__10540,(0),null);var sy = cljs.core.nth.call(null,vec__10540,(1),null);var swidth = cljs.core.nth.call(null,vec__10540,(2),null);var sheight = cljs.core.nth.call(null,vec__10540,(3),null);var vec__10541 = p__10529;var dx = cljs.core.nth.call(null,vec__10541,(0),null);var dy = cljs.core.nth.call(null,vec__10541,(1),null);var dwidth = cljs.core.nth.call(null,vec__10541,(2),null);var dheight = cljs.core.nth.call(null,vec__10541,(3),null);return copy.call(null,src_img,quil.core.current_graphics.call(null),new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [sx,sy,swidth,sheight], null),new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [dx,dy,dwidth,dheight], null));
+var copy__3 = (function (src_img,p__11017,p__11018){var vec__11029 = p__11017;var sx = cljs.core.nth.call(null,vec__11029,(0),null);var sy = cljs.core.nth.call(null,vec__11029,(1),null);var swidth = cljs.core.nth.call(null,vec__11029,(2),null);var sheight = cljs.core.nth.call(null,vec__11029,(3),null);var vec__11030 = p__11018;var dx = cljs.core.nth.call(null,vec__11030,(0),null);var dy = cljs.core.nth.call(null,vec__11030,(1),null);var dwidth = cljs.core.nth.call(null,vec__11030,(2),null);var dheight = cljs.core.nth.call(null,vec__11030,(3),null);return copy.call(null,src_img,quil.core.current_graphics.call(null),new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [sx,sy,swidth,sheight], null),new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [dx,dy,dwidth,dheight], null));
 });
-var copy__4 = (function (src_img,dest_img,p__10530,p__10531){var vec__10542 = p__10530;var sx = cljs.core.nth.call(null,vec__10542,(0),null);var sy = cljs.core.nth.call(null,vec__10542,(1),null);var swidth = cljs.core.nth.call(null,vec__10542,(2),null);var sheight = cljs.core.nth.call(null,vec__10542,(3),null);var vec__10543 = p__10531;var dx = cljs.core.nth.call(null,vec__10543,(0),null);var dy = cljs.core.nth.call(null,vec__10543,(1),null);var dwidth = cljs.core.nth.call(null,vec__10543,(2),null);var dheight = cljs.core.nth.call(null,vec__10543,(3),null);return dest_img.copy(src_img,(sx | (0)),(sy | (0)),(swidth | (0)),(sheight | (0)),(dx | (0)),(dy | (0)),(dwidth | (0)),(dheight | (0)));
+var copy__4 = (function (src_img,dest_img,p__11019,p__11020){var vec__11031 = p__11019;var sx = cljs.core.nth.call(null,vec__11031,(0),null);var sy = cljs.core.nth.call(null,vec__11031,(1),null);var swidth = cljs.core.nth.call(null,vec__11031,(2),null);var sheight = cljs.core.nth.call(null,vec__11031,(3),null);var vec__11032 = p__11020;var dx = cljs.core.nth.call(null,vec__11032,(0),null);var dy = cljs.core.nth.call(null,vec__11032,(1),null);var dwidth = cljs.core.nth.call(null,vec__11032,(2),null);var dheight = cljs.core.nth.call(null,vec__11032,(3),null);return dest_img.copy(src_img,(sx | (0)),(sy | (0)),(swidth | (0)),(sheight | (0)),(dx | (0)),(dy | (0)),(dwidth | (0)),(dheight | (0)));
 });
-copy = function(src_img,dest_img,p__10530,p__10531){
+copy = function(src_img,dest_img,p__11019,p__11020){
 switch(arguments.length){
 case 2:
 return copy__2.call(this,src_img,dest_img);
 case 3:
-return copy__3.call(this,src_img,dest_img,p__10530);
+return copy__3.call(this,src_img,dest_img,p__11019);
 case 4:
-return copy__4.call(this,src_img,dest_img,p__10530,p__10531);
+return copy__4.call(this,src_img,dest_img,p__11019,p__11020);
 }
 throw(new Error('Invalid arity: ' + arguments.length));
 };
@@ -2113,13 +2113,13 @@ quil.core.month = (function month(){return quil.sketch.current_applet.call(null)
 * The value of the system variable mouseButton is either :left, :right,
 * or :center depending on which button is pressed. nil if no button pressed
 */
-quil.core.mouse_button = (function mouse_button(){var button_code = quil.sketch.current_applet.call(null).mouseButton;var pred__10547 = cljs.core._EQ_;var expr__10548 = button_code;if(cljs.core.truth_(pred__10547.call(null,(37),expr__10548)))
+quil.core.mouse_button = (function mouse_button(){var button_code = quil.sketch.current_applet.call(null).mouseButton;var pred__11036 = cljs.core._EQ_;var expr__11037 = button_code;if(cljs.core.truth_(pred__11036.call(null,(37),expr__11037)))
 {return new cljs.core.Keyword(null,"left","left",-399115937);
 } else
-{if(cljs.core.truth_(pred__10547.call(null,(39),expr__10548)))
+{if(cljs.core.truth_(pred__11036.call(null,(39),expr__11037)))
 {return new cljs.core.Keyword(null,"right","right",-452581833);
 } else
-{if(cljs.core.truth_(pred__10547.call(null,(3),expr__10548)))
+{if(cljs.core.truth_(pred__11036.call(null,(3),expr__11037)))
 {return new cljs.core.Keyword(null,"center","center",-748944368);
 } else
 {return null;
@@ -3278,7 +3278,7 @@ return sphere_detail;
 */
 quil.core.spot_light = (function() {
 var spot_light = null;
-var spot_light__5 = (function (p__10550,p__10551,p__10552,angle,concentration){var vec__10556 = p__10550;var r = cljs.core.nth.call(null,vec__10556,(0),null);var g = cljs.core.nth.call(null,vec__10556,(1),null);var b = cljs.core.nth.call(null,vec__10556,(2),null);var vec__10557 = p__10551;var x = cljs.core.nth.call(null,vec__10557,(0),null);var y = cljs.core.nth.call(null,vec__10557,(1),null);var z = cljs.core.nth.call(null,vec__10557,(2),null);var vec__10558 = p__10552;var nx = cljs.core.nth.call(null,vec__10558,(0),null);var ny = cljs.core.nth.call(null,vec__10558,(1),null);var nz = cljs.core.nth.call(null,vec__10558,(2),null);return quil.core.current_graphics.call(null).spotLight(r,g,b,x,y,z,nx,ny,nz,angle,concentration);
+var spot_light__5 = (function (p__11039,p__11040,p__11041,angle,concentration){var vec__11045 = p__11039;var r = cljs.core.nth.call(null,vec__11045,(0),null);var g = cljs.core.nth.call(null,vec__11045,(1),null);var b = cljs.core.nth.call(null,vec__11045,(2),null);var vec__11046 = p__11040;var x = cljs.core.nth.call(null,vec__11046,(0),null);var y = cljs.core.nth.call(null,vec__11046,(1),null);var z = cljs.core.nth.call(null,vec__11046,(2),null);var vec__11047 = p__11041;var nx = cljs.core.nth.call(null,vec__11047,(0),null);var ny = cljs.core.nth.call(null,vec__11047,(1),null);var nz = cljs.core.nth.call(null,vec__11047,(2),null);return quil.core.current_graphics.call(null).spotLight(r,g,b,x,y,z,nx,ny,nz,angle,concentration);
 });
 var spot_light__11 = (function (r,g,b,x,y,z,nx,ny,nz,angle,concentration){return quil.core.current_graphics.call(null).spotLight(r,g,b,x,y,z,nx,ny,nz,angle,concentration);
 });
@@ -4079,8 +4079,8 @@ var opts = null;if (arguments.length > 0) {
   opts = cljs.core.array_seq(Array.prototype.slice.call(arguments, 0),0);} 
 return sketch__delegate.call(this,opts);};
 sketch.cljs$lang$maxFixedArity = 0;
-sketch.cljs$lang$applyTo = (function (arglist__10559){
-var opts = cljs.core.seq(arglist__10559);
+sketch.cljs$lang$applyTo = (function (arglist__11048){
+var opts = cljs.core.seq(arglist__11048);
 return sketch__delegate(opts);
 });
 sketch.cljs$core$IFn$_invoke$arity$variadic = sketch__delegate;

@@ -67,9 +67,9 @@ var handlers = null;if (arguments.length > 1) {
   handlers = cljs.core.array_seq(Array.prototype.slice.call(arguments, 1),0);} 
 return wrap_handlers__delegate.call(this,options,handlers);};
 wrap_handlers.cljs$lang$maxFixedArity = 1;
-wrap_handlers.cljs$lang$applyTo = (function (arglist__10666){
-var options = cljs.core.first(arglist__10666);
-var handlers = cljs.core.rest(arglist__10666);
+wrap_handlers.cljs$lang$applyTo = (function (arglist__11155){
+var options = cljs.core.first(arglist__11155);
+var handlers = cljs.core.rest(arglist__11155);
 return wrap_handlers__delegate(options,handlers);
 });
 wrap_handlers.cljs$core$IFn$_invoke$arity$variadic = wrap_handlers__delegate;

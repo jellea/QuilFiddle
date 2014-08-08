@@ -25,6 +25,7 @@ body {
   min-width: 500px;
   max-width: 40vw;
   transform: translate(-1rem, 0px);
+  -webkit-transform: translate(-1rem, 0px);
   transition: all 0.2s cubic-bezier(.06,1,.93,1);
   padding: 2rem;
   opacity: 0.3;
@@ -34,6 +35,7 @@ body {
 .CodeMirror:hover {
   opacity: 0.95;
   transform: translate(0px, 0px);
+  -webkit-transform: translate(0px, 0px);
 }
 
 #quilfiddle {

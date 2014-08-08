@@ -17,7 +17,7 @@ quil.util.resolve_constant_key = (function resolve_constant_key(key,mappings){re
 * (length-of-longest-key {"foo" 1 "barr" 2 "bazzz" 3}) ;=> 5
 * (length-of-longest-key {}) ;=> 0
 */
-quil.util.length_of_longest_key = (function length_of_longest_key(m){var or__3544__auto__ = cljs.core.last.call(null,cljs.core.sort.call(null,cljs.core.map.call(null,(function (p1__10560_SHARP_){return p1__10560_SHARP_.length();
+quil.util.length_of_longest_key = (function length_of_longest_key(m){var or__3544__auto__ = cljs.core.last.call(null,cljs.core.sort.call(null,cljs.core.map.call(null,(function (p1__11049_SHARP_){return p1__11049_SHARP_.length();
 }),cljs.core.keys.call(null,m))));if(cljs.core.truth_(or__3544__auto__))
 {return or__3544__auto__;
 } else
@@ -60,7 +60,7 @@ return gen_padding;
 })()
 ;
 quil.util.print_definition_list = (function print_definition_list(definitions){var longest_key = quil.util.length_of_longest_key.call(null,definitions);return cljs.core.dorun.call(null,cljs.core.map.call(null,((function (longest_key){
-return (function (p__10563){var vec__10564 = p__10563;var k = cljs.core.nth.call(null,vec__10564,(0),null);var v = cljs.core.nth.call(null,vec__10564,(1),null);var len = k.length();var diff = (longest_key - len);var pad = quil.util.gen_padding.call(null,diff);return cljs.core.println.call(null,k,pad,"- ",v);
+return (function (p__11052){var vec__11053 = p__11052;var k = cljs.core.nth.call(null,vec__11053,(0),null);var v = cljs.core.nth.call(null,vec__11053,(1),null);var len = k.length();var diff = (longest_key - len);var pad = quil.util.gen_padding.call(null,diff);return cljs.core.println.call(null,k,pad,"- ",v);
 });})(longest_key))
 ,definitions));
 });

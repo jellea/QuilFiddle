@@ -2,12 +2,19 @@
  "file":
  "/Users/atonaal/Dev/current/quilfiddle/out/quilfiddle/core.js",
  "sources":["core.cljs"],
- "lineCount":25,
+ "lineCount":39,
  "mappings":
- ";AAAA;;;;;;;;;;AAMA,AAACA;AAED,+BAAA,/BAAKC;AA8BL,4BAAA,wBAAA,pDAAMC,gDAAWC,IACf,iBAAA,bAAMC,MAAI,AAAOD,OACf,oBAAI,AAAoBC;CACtB,OAACC,+BAAU,AAAeD;;CAC1B,OAACC,+BAAU,AAAUD,YAAI,AAAA,AAAIA;;;AAEnC,IAAMD,UAAG,6CAAA,UAAA,iCAAA,yBAAA,mBAAA,iBAAA,CAAA,wCAAA,QAAA,6BAAA,WAAAG,iBAAA,/PAACC,WAAc,wBAAA,xBAAiBC,oPAGO,2CAAAF,pCAACJ;gEAHjD,nDAAS,oBACkBD,+BAUzB,sBAAA,tBAACQ,gCAAmC,+BAAA,2CAAA,sEAAA,hJAACC;AAEvC,AAACC,4CAAuBC;AAExB,AAACP,+BAAUJ",
+ ";AAAA;;;;;;;;;;AAMA,AAACA;AAED,+BAAA,/BAAKC;AAqCL,4BAAA,wBAAA,pDAAMC,gDAAWC,IACf,iBAAA,bAAMC,MAAI,AAAOD,OACf,oBAAI,AAAoBC;CACtB,OAACC,+BAAU,AAAeD;;CAC1B,OAACC,+BAAU,AAAUD,YAAI,AAAA,AAAIA;;;AAEnC,IAAMD,WAAG,6CAAA,UAAA,iCAAA,yBAAA,mBAAA,iBAAA,CAAA,wCAAA,QAAA,6BAAA,WAAAG,kBAAA,hQAACC,WAAc,wBAAA,xBAAiBC,qPAGO,2CAAAF,pCAACJ;gEAHjD,nDAAS,oBACkBD,+BAUzB,sBAAA,tBAACQ,gCAAmC,+BAAA,2CAAA,sEAAA,hJAACC;AAEvC,AAACC,4CAAuBC;AAMxB,wBAAA,xBAAKC;AAEL,wBAAA,kBAAA,AAAA,kDAAA,+CAAA,IAAA,gDAAA,IAAA,nMAAMC,kPAEUD;;AAEhB,yBAAA,wBAAA,jDAAME,0CAAQC,OAEZ,2CAAA,mFAAA,vHAACC,8BAAUD,gJAAWE;;AAExB,uBAAA,sBAAA,7CAAMC,sCAAMH,OACV,+BAAA,/BAACI;AACD,OAACC,4BAAU,AAAA,6EAAIL,OAAO,AAAA,8EAAIA,OAAO,AAAA,6EAAIA,OAAO,AAAA,6EAAIA;;AAGlD,yBAAA,oBAAA,7CAAMM,0CAAQC,GACZ,IAAAC,4CAAAC,4BAAA,AAAA,SAAAD,kBAAAC,mBAAAD,kBAAAC,tHAAKZ,4CAAM,KAAA,JAAKU;;AAElB,8BAAA,mCAAA,jEAAMG,oDAAaV,MAAMW,sEACnBX,1BAEA,gCAAA,mIAAA,nKAACY,+EAAS,AAAA,6EAAID,uDAAU,AAAA,8EAAIA,tUAE5B,8UAAA,mFAAA,1ZAACV,idAAeK;;AAEtB,4BAAA,sBAAA,lDAAMO,kDACJ,kCAAA,sDAAA,SAAA,qDAAA,gIAAA,6EAAA,0EAAA,gFAAA,gGAAA,iEAAA,vpBAACC,kOAEQ,AAAcC,kBAAW,AAAeA,kFACxCjB,2EACDK,8EACEJ,2FACKW,gLACAM;;AAEjB,AAACH",
  "names":
  ["cljs.core/enable-console-print!", "quilfiddle.core/default-code",
   "quilfiddle.core/eval-code", "cm", "doc", "quilfiddle.repl/eval",
-  "p1__9308#", "js/CodeMirror", "js/document",
+  "p1__13975#", "js/CodeMirror", "js/document",
   "js/CodeMirror.extendMode", "cljs.core/clj->js",
-  "quilfiddle.repl/listen-for-output", "cljs.core/prn"]}
+  "quilfiddle.repl/listen-for-output", "cljs.core/prn",
+  "quilfiddle.core/min-r", "quilfiddle.core/setup",
+  "quilfiddle.core/update", "state", "cljs.core/update-in",
+  "cljs.core/inc", "quilfiddle.core/draw", "quil.core/background",
+  "quil.core/ellipse", "quilfiddle.core/shrink", "r",
+  "x__3851__auto__", "y__3852__auto__", "quilfiddle.core/mouse-moved",
+  "event", "cljs.core/assoc", "quilfiddle.core/my-sketch",
+  "quil.core/sketch", "js/window", "quil.middleware/fun-mode"]}
