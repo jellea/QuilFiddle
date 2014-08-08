@@ -6,7 +6,15 @@
 
 (enable-console-print!)
 
-(def default-code "(def min-r 10)
+(def default-code "; QuilFiddle
+; Live code Processing/Quil in the browser
+
+; cmd+enter: eval current line/selection
+; tab: autocomplete
+
+; WIP: Eval works (see console), Quil almost...
+
+(def min-r 10)
 
 (defn setup []
   ; initial state
