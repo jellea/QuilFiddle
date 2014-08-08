@@ -1,6 +1,6 @@
 (ns repl
   (:require [cljs.repl :as repl]
-            [quil.core :as q]))
+            [quil.core :as q :include-macros true]))
 
 (defn ^:export evaluate [text] (repl/eval-print text))
 

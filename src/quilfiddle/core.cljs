@@ -6,8 +6,6 @@
 
 (enable-console-print!)
 
-;(repl/load-file "quil/core.cljs")
-
 (def default-code "(defn setup []
   (quil.core/hint :enable-retina-pixels)
   (quil.core/frame-rate 30)
@@ -30,13 +28,13 @@
                          (/ (quil.core/height) 2)]
       (quil.core/ellipse x y 100 100))))
 
-(quil.core/defsketch quilfiddle
-  :host \"quilfiddle\"
-  :size [500 500]
-  :setup setup
-  :update update
-  :draw draw
-  :middleware [quil.middleware/fun-mode])")
+(defn my-sketch []
+  (quil.core/sketch
+    :host \"canvas\"
+    :size [500 500]
+    :setup setup
+    :update update
+    :draw draw))")
 
 (defn eval-code [cm]
   (let [doc (.-doc cm)]
@@ -59,7 +57,7 @@
 
 (repl/listen-for-output prn)
 
-;(repl/eval "default-code")
+(repl/eval default-code)
 
 ;(defn setup []
   ;(q/hint :enable-retina-pixels)
