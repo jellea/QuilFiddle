@@ -10,6 +10,7 @@
 ; Live code Processing/Quil in the browser
 
 ; cmd+enter: eval current line/selection
+; alt+cmd+enter: eval all
 ; tab: autocomplete
 
 ; WIP: Eval works (see console), Quil almost...
@@ -60,7 +61,8 @@
 (let [cm (js/CodeMirror (.getElementById js/document "editor")
                #js {:value default-code
                     :mode "clojure"
-                    :extraKeys #js {:Cmd-Enter #(eval-code %)
+                    :extraKeys #js {:Cmd-Alt-Enter #(repl/eval (.getValue %))
+                                    :Cmd-Enter #(eval-code %)
                                     :Tab "autocomplete"}
                     ;:lineNumbers true
                     :gutters #js ["CodeMirror-linenumbers"]
