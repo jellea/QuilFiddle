@@ -50,23 +50,12 @@
     nil))
 
 (defn put! [state blk ^not-native c val]
-  (if-let [cb (impl/put! c val (fn-handler (fn []
-                                             (ioc/aset-all! state VALUE-IDX nil STATE-IDX blk)
+  (if-let [cb (impl/put! c val (fn-handler (fn [ret-val]
+                                             (ioc/aset-all! state VALUE-IDX ret-val STATE-IDX blk)
                                              (run-state-machine-wrapped state))))]
     (do (ioc/aset-all! state VALUE-IDX @cb STATE-IDX blk)
         :recur)
     nil))
-
-(defn ioc-alts! [state cont-block ports & {:as opts}]
-  (ioc/aset-all! state STATE-IDX cont-block)
-  (when-let [cb (cljs.core.async/do-alts
-                  (fn [val]
-                    (ioc/aset-all! state VALUE-IDX val)
-                    (run-state-machine-wrapped state))
-                  ports
-                  opts)]
-    (ioc/aset-all! state VALUE-IDX @cb)
-    :recur))
 
 (defn return-chan [state value]
   (let [^not-native c (aget state USER-START-IDX)]
@@ -152,4 +141,4 @@
                    EXCEPTION-FRAMES
                    (:prev exception-frame)))
 
-     :else (assert false "No matching clause"))))
+     :else (throw (js/Error. "No matching clause")))))

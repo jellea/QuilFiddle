@@ -1,16 +1,20 @@
 (ns quilfiddle.core
-  (:require [cljs.reader :as reader]
-            [quilfiddle.repl :as repl]
-            [quil.core :as q :include-macros true]
-            [quil.middleware :as m]))
+  (:require [cljs.pprint :refer [pprint]]
+            [cljs.js :as cljs]
+            [cljs.tools.reader :as r]
+            [cljsjs.codemirror.mode.clojure]
+            ;[cljsjs.codemirror.addons.matchbrackets]
+            [quil.core]
+            [quil.middleware]))
 
 (enable-console-print!)
+
+; TODO: alt+cmd+enter: eval all
 
 (def default-code "; QuilFiddle
 ; Live code Processing/Quil in the browser
 
 ; cmd+enter: eval current line/selection
-; alt+cmd+enter: eval all
 ; tab: autocomplete
 
 ; WIP: Eval works (see console), Quil almost...
@@ -21,70 +25,7 @@
   ; initial state
   {:x 0 :y 0 :r min-r})
 
-(defn update [state]
-  ; increase radius of the circle by 1 on each frame
-  (update-in state [:r] inc))
-
-(defn draw [state]
-  (quil.core/background 255)
-  (quil.core/ellipse (:x state) (:y state) (:r state) (:r state)))
-
-; decrease radius by 1 but keeping it not less than min-r
-(defn shrink [r]
-  (max min-r (dec r)))
-
-(defn mouse-moved [state event]
-  (-> state
-      ; set circle position to mouse position
-      (assoc :x (:x event) :y (:y event))
-      ; decrease radius
-      (update-in [:r] shrink)))
-
-(defn my-sketch []
-  (quil.core/sketch
-    :host \"canvas\"
-    :size [1000 1000]
-    :setup setup
-    :draw draw
-    :update update
-    :mouse-moved mouse-moved
-    :middleware [quil.middleware/fun-mode]))
-
-(my-sketch)")
-
-(defn eval-code [cm]
-  (let [doc (.-doc cm)]
-    (if (.somethingSelected doc)
-      (repl/eval (.getSelection doc))
-      (repl/eval (.getLine doc (-> doc .getCursor .-line))))))
-
-(let [cm (js/CodeMirror (.getElementById js/document "editor")
-               #js {:value default-code
-                    :mode "clojure"
-                    :extraKeys #js {:Cmd-Alt-Enter #(repl/eval (.getValue %))
-                                    :Cmd-Enter #(eval-code %)
-                                    :Tab "autocomplete"}
-                    ;:lineNumbers true
-                    :gutters #js ["CodeMirror-linenumbers"]
-                    :autofocus true
-                    :styleActiveLine true
-                    :matchBrackets true
-                    :theme "paraiso-dark"})]
-  (js/CodeMirror.extendMode "clojure" (clj->js {:hint-pattern #"[\w\-\>\:\*\$\?\<\!\+\.\/foo]"})))
-
-(repl/listen-for-output prn)
-
-;(repl/eval default-code)
-
-; Cheating... ;)
-
-(def min-r 10)
-
-(defn setup []
-  ; initial state
-  {:x 0 :y 0 :r min-r})
-
-(defn update [state]
+(defn update! [state]
   ; increase radius of the circle by 1 on each frame
   (update-in state [:r] inc))
 
@@ -105,12 +46,58 @@
 
 (defn my-sketch []
   (q/sketch
-    :host "canvas"
-    :size [(.-innerWidth js/window) (.-innerHeight js/window)]
+    :host \"canvas\"
+    :size [window.innerWidth window.innerHeight]
     :setup setup
     :draw draw
-    :update update
+    :update update!
     :mouse-moved mouse-moved
-    :middleware [quil.middleware/fun-mode]))
+    :middleware [m/fun-mode]))
 
-(my-sketch)
+(my-sketch)")
+
+(set! (.. js/window -cljs -user) #js {})
+
+(def st (cljs/empty-state))
+
+(defn eval [in-str]
+  (cljs/eval-str st in-str 'fiddle.runtime
+                 {:eval cljs/js-eval :source-map true}
+                 (fn [{:keys [error value]}]
+                   (if-not error
+                     (js/console.log value)
+                     (do
+                       (.error js/console error))))))
+
+(defn eval-code [cm]
+  (let [doc (.-doc cm)]
+    (if (.somethingSelected doc)
+      (eval (.getSelection doc))
+      (eval (.getLine doc (-> doc .getCursor .-line))))))
+
+(let [cm (js/CodeMirror (.getElementById js/document "editor")
+               #js {:value default-code
+                    :mode "clojure"
+                    :extraKeys #js {                        ;:Cmd-Alt-Enter #(eval-code (.getValue %))
+                                    :Cmd-Enter #(eval-code %)
+                                    :Tab "autocomplete"}
+                    ;:lineNumbers true
+                    :gutters #js ["CodeMirror-linenumbers"]
+                    :autofocus true
+                    :styleActiveLine true
+                    :matchBrackets true
+                    :theme "paraiso-dark"})]
+  (js/CodeMirror.extendMode "clojure" (clj->js {:hint-pattern #"[\w\-\>\:\*\$\?\<\!\+\.\/foo]"})))
+
+(defn load [lib cb]
+  (cb {:lang :clj :source (str 'quil.core 'quil.middleware)}))
+
+(cljs/eval-str st (str "(ns fiddle.runtime (:require [quil.core :as q] [quil.middleware :as m])) " default-code) 'fiddle.runtime
+              {:eval cljs/js-eval
+               :load load
+               :source-map true}
+              (fn [{:keys [error value]}]
+                (if-not error
+                  (js/console.log value)
+                  (do
+                    (.error js/console error)))))

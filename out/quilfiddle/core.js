@@ -1,40 +1,62 @@
-// Compiled by ClojureScript 0.0-2280
+// Compiled by ClojureScript 1.7.35 {:static-fns true, :optimize-constants true}
 goog.provide('quilfiddle.core');
 goog.require('cljs.core');
-goog.require('quil.middleware');
-goog.require('quil.middleware');
+goog.require('cljs.pprint');
+goog.require('cljs.js');
+goog.require('cljs.tools.reader');
+goog.require('cljsjs.codemirror.mode.clojure');
 goog.require('quil.core');
-goog.require('quil.core');
-goog.require('quilfiddle.repl');
-goog.require('quilfiddle.repl');
-goog.require('cljs.reader');
-goog.require('cljs.reader');
-cljs.core.enable_console_print_BANG_.call(null);
-quilfiddle.core.default_code = "; QuilFiddle\n; Live code Processing/Quil in the browser\n\n; cmd+enter: eval current line/selection\n; alt+cmd+enter: eval all\n; tab: autocomplete\n\n; WIP: Eval works (see console), Quil almost...\n\n(def min-r 10)\n\n(defn setup []\n  ; initial state\n  {:x 0 :y 0 :r min-r})\n\n(defn update [state]\n  ; increase radius of the circle by 1 on each frame\n  (update-in state [:r] inc))\n\n(defn draw [state]\n  (quil.core/background 255)\n  (quil.core/ellipse (:x state) (:y state) (:r state) (:r state)))\n\n; decrease radius by 1 but keeping it not less than min-r\n(defn shrink [r]\n  (max min-r (dec r)))\n\n(defn mouse-moved [state event]\n  (-> state\n      ; set circle position to mouse position\n      (assoc :x (:x event) :y (:y event))\n      ; decrease radius\n      (update-in [:r] shrink)))\n\n(defn my-sketch []\n  (quil.core/sketch\n    :host \"canvas\"\n    :size [1000 1000]\n    :setup setup\n    :draw draw\n    :update update\n    :mouse-moved mouse-moved\n    :middleware [quil.middleware/fun-mode]))\n\n(my-sketch)";
-quilfiddle.core.eval_code = (function eval_code(cm){var doc = cm.doc;if(cljs.core.truth_(doc.somethingSelected()))
-{return quilfiddle.repl.eval.call(null,doc.getSelection());
-} else
-{return quilfiddle.repl.eval.call(null,doc.getLine(doc.getCursor().line));
+goog.require('quil.middleware');
+cljs.core.enable_console_print_BANG_();
+quilfiddle.core.default_code = "; QuilFiddle\n; Live code Processing/Quil in the browser\n\n; cmd+enter: eval current line/selection\n; tab: autocomplete\n\n; WIP: Eval works (see console), Quil almost...\n\n(def min-r 10)\n\n(defn setup []\n  ; initial state\n  {:x 0 :y 0 :r min-r})\n\n(defn update! [state]\n  ; increase radius of the circle by 1 on each frame\n  (update-in state [:r] inc))\n\n(defn draw [state]\n  (q/background 255)\n  (q/ellipse (:x state) (:y state) (:r state) (:r state)))\n\n; decrease radius by 1 but keeping it not less than min-r\n(defn shrink [r]\n  (max min-r (dec r)))\n\n(defn mouse-moved [state event]\n  (-> state\n      ; set circle position to mouse position\n      (assoc :x (:x event) :y (:y event))\n      ; decrease radius\n      (update-in [:r] shrink)))\n\n(defn my-sketch []\n  (q/sketch\n    :host \"canvas\"\n    :size [window.innerWidth window.innerHeight]\n    :setup setup\n    :draw draw\n    :update update!\n    :mouse-moved mouse-moved\n    :middleware [m/fun-mode]))\n\n(my-sketch)";
+window.cljs.user = {};
+quilfiddle.core.st = cljs.js.empty_state.cljs$core$IFn$_invoke$arity$0();
+quilfiddle.core.eval = (function quilfiddle$core$eval(in_str){
+return cljs.js.eval_str.cljs$core$IFn$_invoke$arity$5(quilfiddle.core.st,in_str,cljs.core.cst$sym$fiddle$runtime,new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$eval,cljs.js.js_eval,cljs.core.cst$kw$source_DASH_map,true], null),(function (p__17844){
+var map__17845 = p__17844;
+var map__17845__$1 = ((((!((map__17845 == null)))?((((map__17845.cljs$lang$protocol_mask$partition0$ & (64))) || (map__17845.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__17845):map__17845);
+var error = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17845__$1,cljs.core.cst$kw$error);
+var value = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17845__$1,cljs.core.cst$kw$value);
+if(cljs.core.not(error)){
+return console.log(value);
+} else {
+return console.error(error);
+}
+}));
+});
+quilfiddle.core.eval_code = (function quilfiddle$core$eval_code(cm){
+var doc = cm.doc;
+if(cljs.core.truth_(doc.somethingSelected())){
+return quilfiddle.core.eval(doc.getSelection());
+} else {
+return quilfiddle.core.eval(doc.getLine(doc.getCursor().line));
 }
 });
-var cm_14024 = CodeMirror(document.getElementById("editor"),{"theme": "paraiso-dark", "matchBrackets": true, "styleActiveLine": true, "autofocus": true, "gutters": ["CodeMirror-linenumbers"], "extraKeys": {"Tab": "autocomplete", "Cmd-Enter": (function (p1__14023_SHARP_){return quilfiddle.core.eval_code.call(null,p1__14023_SHARP_);
-}), "Cmd-Alt-Enter": (function (p1__14022_SHARP_){return quilfiddle.repl.eval.call(null,p1__14022_SHARP_.getValue());
-})}, "mode": "clojure", "value": quilfiddle.core.default_code});CodeMirror.extendMode("clojure",cljs.core.clj__GT_js.call(null,new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"hint-pattern","hint-pattern",-1622710880),/[\w\-\>\:\*\$\?\<\!\+\.\\/foo]/], null)));
-quilfiddle.repl.listen_for_output.call(null,cljs.core.prn);
-quilfiddle.core.min_r = (10);
-quilfiddle.core.setup = (function setup(){return new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"x","x",2099068185),(0),new cljs.core.Keyword(null,"y","y",-1757859776),(0),new cljs.core.Keyword(null,"r","r",-471384190),quilfiddle.core.min_r], null);
+var cm_17852 = (function (){var G__17848 = document.getElementById("editor");
+var G__17849 = {"value": quilfiddle.core.default_code, "mode": "clojure", "extraKeys": {"Cmd-Enter": ((function (G__17848){
+return (function (p1__17847_SHARP_){
+return quilfiddle.core.eval_code(p1__17847_SHARP_);
+});})(G__17848))
+, "Tab": "autocomplete"}, "gutters": ["CodeMirror-linenumbers"], "autofocus": true, "styleActiveLine": true, "matchBrackets": true, "theme": "paraiso-dark"};
+return CodeMirror(G__17848,G__17849);
+})();
+var G__17850_17853 = "clojure";
+var G__17851_17854 = cljs.core.clj__GT_js(new cljs.core.PersistentArrayMap(null, 1, [cljs.core.cst$kw$hint_DASH_pattern,/[\w\-\>\:\*\$\?\<\!\+\.\\/foo]/], null));
+CodeMirror.extendMode(G__17850_17853,G__17851_17854);
+quilfiddle.core.load = (function quilfiddle$core$load(lib,cb){
+var G__17856 = new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$lang,cljs.core.cst$kw$clj,cljs.core.cst$kw$source,[cljs.core.str(cljs.core.cst$sym$quil$core),cljs.core.str(cljs.core.cst$sym$quil$middleware)].join('')], null);
+return (cb.cljs$core$IFn$_invoke$arity$1 ? cb.cljs$core$IFn$_invoke$arity$1(G__17856) : cb.call(null,G__17856));
 });
-quilfiddle.core.update = (function update(state){return cljs.core.update_in.call(null,state,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"r","r",-471384190)], null),cljs.core.inc);
-});
-quilfiddle.core.draw = (function draw(state){quil.core.background.call(null,(255));
-return quil.core.ellipse.call(null,new cljs.core.Keyword(null,"x","x",2099068185).cljs$core$IFn$_invoke$arity$1(state),new cljs.core.Keyword(null,"y","y",-1757859776).cljs$core$IFn$_invoke$arity$1(state),new cljs.core.Keyword(null,"r","r",-471384190).cljs$core$IFn$_invoke$arity$1(state),new cljs.core.Keyword(null,"r","r",-471384190).cljs$core$IFn$_invoke$arity$1(state));
-});
-quilfiddle.core.shrink = (function shrink(r){var x__3851__auto__ = quilfiddle.core.min_r;var y__3852__auto__ = (r - (1));return ((x__3851__auto__ > y__3852__auto__) ? x__3851__auto__ : y__3852__auto__);
-});
-quilfiddle.core.mouse_moved = (function mouse_moved(state,event){return cljs.core.update_in.call(null,cljs.core.assoc.call(null,state,new cljs.core.Keyword(null,"x","x",2099068185),new cljs.core.Keyword(null,"x","x",2099068185).cljs$core$IFn$_invoke$arity$1(event),new cljs.core.Keyword(null,"y","y",-1757859776),new cljs.core.Keyword(null,"y","y",-1757859776).cljs$core$IFn$_invoke$arity$1(event)),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"r","r",-471384190)], null),quilfiddle.core.shrink);
-});
-quilfiddle.core.my_sketch = (function my_sketch(){return quil.core.sketch.call(null,new cljs.core.Keyword(null,"host","host",-1558485167),"canvas",new cljs.core.Keyword(null,"size","size",1098693007),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [window.innerWidth,window.innerHeight], null),new cljs.core.Keyword(null,"setup","setup",1987730512),quilfiddle.core.setup,new cljs.core.Keyword(null,"draw","draw",1358331674),quilfiddle.core.draw,new cljs.core.Keyword(null,"update","update",1045576396),quilfiddle.core.update,new cljs.core.Keyword(null,"mouse-moved","mouse-moved",-1918152310),quilfiddle.core.mouse_moved,new cljs.core.Keyword(null,"middleware","middleware",1462115504),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [quil.middleware.fun_mode], null));
-});
-quilfiddle.core.my_sketch.call(null);
+cljs.js.eval_str.cljs$core$IFn$_invoke$arity$5(quilfiddle.core.st,[cljs.core.str("(ns fiddle.runtime (:require [quil.core :as q] [quil.middleware :as m])) "),cljs.core.str(quilfiddle.core.default_code)].join(''),cljs.core.cst$sym$fiddle$runtime,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$eval,cljs.js.js_eval,cljs.core.cst$kw$load,quilfiddle.core.load,cljs.core.cst$kw$source_DASH_map,true], null),(function (p__17857){
+var map__17858 = p__17857;
+var map__17858__$1 = ((((!((map__17858 == null)))?((((map__17858.cljs$lang$protocol_mask$partition0$ & (64))) || (map__17858.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__17858):map__17858);
+var error = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17858__$1,cljs.core.cst$kw$error);
+var value = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17858__$1,cljs.core.cst$kw$value);
+if(cljs.core.not(error)){
+return console.log(value);
+} else {
+return console.error(error);
+}
+}));
 
 //# sourceMappingURL=core.js.map

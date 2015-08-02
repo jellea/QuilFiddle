@@ -6,7 +6,8 @@
               [cljs.core.async.impl.timers :as timers]
               [cljs.core.async.impl.dispatch :as dispatch]
               [cljs.core.async.impl.ioc-helpers :as helpers])
-    (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
+    (:require-macros [cljs.core.async.impl.ioc-macros :as ioc]
+                     [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn- fn-handler [f]
   (reify
@@ -39,16 +40,26 @@
   (satisfies? impl/UnblockingBuffer buff))
 
 (defn chan
-  "Creates a channel with an optional buffer. If buf-or-n is a number,
-  will create and use a fixed buffer of that size."
+  "Creates a channel with an optional buffer, an optional transducer (like (map f),
+  (filter p) etc or a composition thereof), and an optional exception handler.
+  If buf-or-n is a number, will create and use a fixed buffer of that size. If a
+  transducer is supplied a buffer must be specified. ex-handler must be a
+  fn of one argument - if an exception occurs during transformation it will be called
+  with the thrown value as an argument, and any non-nil return value will be placed
+  in the channel."
   ([] (chan nil))
-  ([buf-or-n]
-     (let [buf-or-n (if (= buf-or-n 0)
-                      nil
-                      buf-or-n)]
-       (channels/chan (if (number? buf-or-n)
-                        (buffer buf-or-n)
-                        buf-or-n)))))
+  ([buf-or-n] (chan buf-or-n nil nil))
+  ([buf-or-n xform] (chan buf-or-n xform nil))
+  ([buf-or-n xform ex-handler]
+   (let [buf-or-n (if (= buf-or-n 0)
+                    nil
+                    buf-or-n)]
+     (when xform (assert buf-or-n "buffer must be supplied when transducer is"))
+     (channels/chan (if (number? buf-or-n)
+                      (buffer buf-or-n)
+                      buf-or-n)
+                    xform
+                    ex-handler))))
 
 (defn timeout
   "Returns a channel that will close after msecs"
@@ -57,9 +68,10 @@
 
 (defn <!
   "takes a val from port. Must be called inside a (go ...) block. Will
-  return nil if closed. Will park if nothing is available."
+  return nil if closed. Will park if nothing is available.
+  Returns true unless port is already closed"
   [port]
-  (assert nil "<! used not in (go ...) block"))
+  (throw (js/Error. "<! used not in (go ...) block")))
 
 (defn take!
   "Asynchronously takes a val from port, passing to fn1. Will pass nil
@@ -76,28 +88,34 @@
              (dispatch/run #(fn1 val)))))
        nil)))
 
-(defn- nop [])
+(defn- nop [_])
+(def ^:private fhnop (fn-handler nop))
 
 (defn >!
   "puts a val into port. nil values are not allowed. Must be called
-  inside a (go ...) block. Will park if no buffer space is available."
+  inside a (go ...) block. Will park if no buffer space is available.
+  Returns true unless port is already closed."
   [port val]
-  (assert nil ">! used not in (go ...) block"))
+  (throw (js/Error. ">! used not in (go ...) block")))
 
 (defn put!
   "Asynchronously puts a val into port, calling fn0 (if supplied) when
    complete. nil values are not allowed. Will throw if closed. If
    on-caller? (default true) is true, and the put is immediately
    accepted, will call fn0 on calling thread.  Returns nil."
-  ([port val] (put! port val nop))
-  ([port val fn0] (put! port val fn0 true))
-  ([port val fn0 on-caller?]
-     (let [ret (impl/put! port val (fn-handler fn0))]
-       (when (and ret (not= fn0 nop))
+  ([port val]
+     (if-let [ret (impl/put! port val fhnop)]
+       @ret
+       true))
+  ([port val fn1] (put! port val fn1 true))
+  ([port val fn1 on-caller?]
+     (if-let [retb (impl/put! port val (fn-handler fn1))]
+       (let [ret @retb]
          (if on-caller?
-           (fn0)
-           (dispatch/run fn0)))
-       nil)))
+           (fn1 ret)
+           (dispatch/run #(fn1 ret)))
+         ret)
+       true)))
 
 (defn close!
   ([port]
@@ -150,7 +168,7 @@
                   wport (when (vector? port) (port 0))
                   vbox (if wport
                          (let [val (port 1)]
-                           (impl/put! wport val (alt-handler flag #(fret [nil wport]))))
+                           (impl/put! wport val (alt-handler flag #(fret [% wport]))))
                          (impl/take! port (alt-handler flag #(fret [% port]))))]
               (if vbox
                 (channels/box [@vbox (or wport port)])
@@ -163,8 +181,8 @@
 
 (defn alts!
   "Completes at most one of several channel operations. Must be called
-  inside a (go ...) block. ports is a vector of channel endpoints, which
-  can be either a channel to take from or a vector of
+   inside a (go ...) block. ports is a vector of channel endpoints,
+   which can be either a channel to take from or a vector of
   [channel-to-put-to val-to-put], in any combination. Takes will be
   made as if by <!, and puts will be made as if by >!. Unless
   the :priority option is true, if more than one port operation is
@@ -172,7 +190,8 @@
   ready and a :default value is supplied, [default-val :default] will
   be returned, otherwise alts! will park until the first operation to
   become ready completes. Returns [val port] of the completed
-  operation, where val is the value taken for takes, and nil for puts.
+  operation, where val is the value taken for takes, and a
+  boolean (true unless already closed, as per put!) for puts.
 
   opts are passed as :key val ... Supported options:
 
@@ -184,161 +203,107 @@
   depended upon for side effects."
 
   [ports & {:as opts}]
-  (assert nil "alts! used not in (go ...) block"))
+  (throw (js/Error. "alts! used not in (go ...) block")))
 
 ;;;;;;; channel ops
 
-
-(defn map<
-  "Takes a function and a source channel, and returns a channel which
-  contains the values produced by applying f to each value taken from
-  the source channel"
-  [f ch]
-  (reify
-   impl/Channel
-   (close! [_] (impl/close! ch))
-
-   impl/ReadPort
-   (take! [_ fn1]
-     (let [ret
-       (impl/take! ch
-         (reify
-          impl/Handler
-          (active? [_] (impl/active? fn1))
-          (lock-id [_] (impl/lock-id fn1))
-          (commit [_]
-           (let [f1 (impl/commit fn1)]
-             #(f1 (if (nil? %) nil (f %)))))))]
-       (if (and ret (not (nil? @ret)))
-         (channels/box (f @ret))
-         ret)))
-
-   impl/WritePort
-   (put! [_ val fn0] (impl/put! ch val fn0))))
-
-(defn map>
-  "Takes a function and a target channel, and returns a channel which
-  applies f to each value before supplying it to the target channel."
-  [f ch]
-  (reify
-   impl/Channel
-   (close! [_] (impl/close! ch))
-
-   impl/ReadPort
-   (take! [_ fn1] (impl/take! ch fn1))
-
-   impl/WritePort
-   (put! [_ val fn0]
-     (impl/put! ch (f val) fn0))))
-
-
-
-(defn filter>
-  "Takes a predicate and a target channel, and returns a channel which
-  supplies only the values for which the predicate returns true to the
-  target channel."
-  [p ch]
-  (reify
-   impl/Channel
-   (close! [_] (impl/close! ch))
-
-   impl/ReadPort
-   (take! [_ fn1] (impl/take! ch fn1))
-
-   impl/WritePort
-   (put! [_ val fn0]
-    (if (p val)
-      (impl/put! ch val fn0)
-      (channels/box nil)))))
-
-(defn remove>
-  "Takes a predicate and a target channel, and returns a channel which
-  supplies only the values for which the predicate returns false to the
-  target channel."
-  [p ch]
-  (filter> (complement p) ch))
-
-(defn filter<
-  "Takes a predicate and a source channel, and returns a channel which
-  contains only the values taken from the source channel for which the
-  predicate returns true. The returned channel will be unbuffered by
-  default, or a buf-or-n can be supplied. The channel will close
-  when the source channel closes."
-  ([p ch] (filter< p ch nil))
-  ([p ch buf-or-n]
-     (let [out (chan buf-or-n)]
-       (go-loop []
-         (let [val (<! ch)]
-           (if (nil? val)
-             (close! out)
-             (do (when (p val)
-                   (>! out val))
-                 (recur)))))
-       out)))
-
-(defn remove<
-  "Takes a predicate and a source channel, and returns a channel which
-  contains only the values taken from the source channel for which the
-  predicate returns false. The returned channel will be unbuffered by
-  default, or a buf-or-n can be supplied. The channel will close
-  when the source channel closes."
-  ([p ch] (remove< p ch nil))
-  ([p ch buf-or-n] (filter< (complement p) ch buf-or-n)))
-
-(defn- mapcat* [f in out]
-  (go-loop []
-    (let [val (<! in)]
-      (if (nil? val)
-        (close! out)
-        (let [vals (f val)]
-          (doseq [v vals]
-            (>! out v))
-          (recur))))))
-
-(defn mapcat<
-  "Takes a function and a source channel, and returns a channel which
-  contains the values in each collection produced by applying f to
-  each value taken from the source channel. f must return a
-  collection.
-
-  The returned channel will be unbuffered by default, or a buf-or-n
-  can be supplied. The channel will close when the source channel
-  closes."
-  ([f in] (mapcat< f in nil))
-  ([f in buf-or-n]
-    (let [out (chan buf-or-n)]
-      (mapcat* f in out)
-      out)))
-
-(defn mapcat>
-  "Takes a function and a target channel, and returns a channel which
-  applies f to each value put, then supplies each element of the result
-  to the target channel. f must return a collection.
-
-  The returned channel will be unbuffered by default, or a buf-or-n
-  can be supplied. The target channel will be closed when the source
-  channel closes."
-
-  ([f out] (mapcat> f out nil))
-  ([f out buf-or-n]
-     (let [in (chan buf-or-n)]
-       (mapcat* f in out)
-       in)))
-
 (defn pipe
   "Takes elements from the from channel and supplies them to the to
-  channel. By default, the to channel will be closed when the
-  from channel closes, but can be determined by the close?
-  parameter."
+   channel. By default, the to channel will be closed when the from
+   channel closes, but can be determined by the close?  parameter. Will
+   stop consuming the from channel if the to channel closes"
+
   ([from to] (pipe from to true))
   ([from to close?]
      (go-loop []
       (let [v (<! from)]
         (if (nil? v)
           (when close? (close! to))
-          (do (>! to v)
+          (when (>! to v)
               (recur)))))
      to))
+
+(defn- pipeline*
+  ([n to xf from close? ex-handler type]
+     (assert (pos? n))
+     (let [jobs (chan n)
+           results (chan n)
+           process (fn [[v p :as job]]
+                     (if (nil? job)
+                       (do (close! results) nil)
+                       (let [res (chan 1 xf ex-handler)]
+                         (go
+                           (>! res v)
+                           (close! res))
+                         (put! p res)
+                         true)))
+           async (fn [[v p :as job]]
+                   (if (nil? job)
+                     (do (close! results) nil)
+                     (let [res (chan 1)]
+                       (xf v res)
+                       (put! p res)
+                       true)))]
+       (dotimes [_ n]
+         (case type
+           :compute  (go-loop []
+                               (let [job (<! jobs)]
+                                 (when (process job)
+                                   (recur))))
+           :async (go-loop []
+                           (let [job (<! jobs)]
+                             (when (async job)
+                               (recur))))))
+       (go-loop []
+                  (let [v (<! from)]
+                    (if (nil? v)
+                      (close! jobs)
+                      (let [p (chan 1)]
+                        (>! jobs [v p])
+                        (>! results p)
+                        (recur)))))
+       (go-loop []
+                  (let [p (<! results)]
+                    (if (nil? p)
+                      (when close? (close! to))
+                      (let [res (<! p)]
+                        (loop []
+                          (let [v (<! res)]
+                            (when (and (not (nil? v)) (>! to v))
+                              (recur))))
+                        (recur))))))))
+
+(defn pipeline-async
+  "Takes elements from the from channel and supplies them to the to
+  channel, subject to the async function af, with parallelism n. af
+  must be a function of two arguments, the first an input value and
+  the second a channel on which to place the result(s). af must close!
+  the channel before returning.  The presumption is that af will
+  return immediately, having launched some asynchronous operation
+  whose completion/callback will manipulate the result channel. Outputs
+  will be returned in order relative to  the inputs. By default, the to
+  channel will be closed when the from channel closes, but can be
+  determined by the close?  parameter. Will stop consuming the from
+  channel if the to channel closes."
+  ([n to af from] (pipeline-async n to af from true))
+  ([n to af from close?] (pipeline* n to af from close? nil :async)))
+
+(defn pipeline
+  "Takes elements from the from channel and supplies them to the to
+  channel, subject to the transducer xf, with parallelism n. Because
+  it is parallel, the transducer will be applied independently to each
+  element, not across elements, and may produce zero or more outputs
+  per input.  Outputs will be returned in order relative to the
+  inputs. By default, the to channel will be closed when the from
+  channel closes, but can be determined by the close?  parameter. Will
+  stop consuming the from channel if the to channel closes.
+
+  Note this is supplied for API compatibility with the Clojure version.
+  Values of N > 1 will not result in actual concurrency in a
+  single-threaded runtime."
+  ([n to xf from] (pipeline n to xf from true))
+  ([n to xf from close?] (pipeline n to xf from close? nil))
+  ([n to xf from close? ex-handler] (pipeline* n to xf from close? ex-handler :compute)))
 
 (defn split
   "Takes a predicate and a source channel and returns a vector of two
@@ -354,11 +319,11 @@
      (let [tc (chan t-buf-or-n)
            fc (chan f-buf-or-n)]
        (go-loop []
-         (let [v (<! ch)]
-           (if (nil? v)
-             (do (close! tc) (close! fc))
-             (do (>! (if (p v) tc fc) v)
-                 (recur)))))
+                (let [v (<! ch)]
+                  (if (nil? v)
+                    (do (close! tc) (close! fc))
+                    (when (>! (if (p v) tc fc) v)
+                      (recur)))))
        [tc fc])))
 
 (defn reduce
@@ -385,11 +350,10 @@
   ([ch coll] (onto-chan ch coll true))
   ([ch coll close?]
      (go-loop [vs (seq coll)]
-       (if vs
-         (do (>! ch (first vs))
-             (recur (next vs)))
-         (when close?
-           (close! ch))))))
+              (if (and vs (>! ch (first vs)))
+                (recur (next vs))
+                (when close?
+                  (close! ch))))))
 
 
 (defn to-chan
@@ -420,7 +384,7 @@
 
   Items received when there are no taps get dropped.
 
-  If a tap put throws an exception, it will be removed from the mult."
+  If a tap puts to a closed channel, it will be removed from the mult."
   [ch]
   (let [cs (atom {}) ;;ch->close?
         m (reify
@@ -433,8 +397,8 @@
            (untap-all* [_] (reset! cs {}) nil))
         dchan (chan 1)
         dctr (atom nil)
-        done #(when (zero? (swap! dctr dec))
-                (put! dchan true))]
+        done (fn [_] (when (zero? (swap! dctr dec))
+                      (put! dchan true)))]
     (go-loop []
      (let [val (<! ch)]
        (if (nil? val)
@@ -443,11 +407,9 @@
          (let [chs (keys @cs)]
            (reset! dctr (count chs))
            (doseq [c chs]
-               (try
-                 (put! c val done)
-                 (catch js/Object e
-                   (swap! dctr dec)
-                   (untap* m c))))
+               (when-not (put! c val done)
+                 (done nil)
+                 (untap* m c)))
            ;;wait for all
            (when (seq chs)
              (<! dchan))
@@ -477,6 +439,17 @@
   (unmix-all* [m])
   (toggle* [m state-map])
   (solo-mode* [m mode]))
+
+(defn ioc-alts! [state cont-block ports & {:as opts}]
+  (ioc/aset-all! state helpers/STATE-IDX cont-block)
+  (when-let [cb (cljs.core.async/do-alts
+                  (fn [val]
+                    (ioc/aset-all! state helpers/VALUE-IDX val)
+                    (helpers/run-state-machine-wrapped state))
+                  ports
+                  opts)]
+    (ioc/aset-all! state helpers/VALUE-IDX @cb)
+    :recur))
 
 (defn mix
   "Creates and returns a mix of one or more input channels which will
@@ -541,9 +514,10 @@
           (do (when (nil? v)
                 (swap! cs dissoc c))
               (recur (calc-state)))
-          (do (when (or (solos c)
-                        (and (empty? solos) (not (mutes c))))
-                (>! out v))
+          (if (or (solos c)
+                  (and (empty? solos) (not (mutes c))))
+            (when (>! out v)
+              (recur state))
             (recur state)))))
     m))
 
@@ -635,10 +609,8 @@
              (let [topic (topic-fn val)
                    m (get @mults topic)]
                (when m
-                 (try
-                   (>! (muxch* m) val)
-                   (catch js/Object e
-                     (swap! mults dissoc topic))))
+                 (when-not (>! (muxch* m) val)
+                   (swap! mults dissoc topic)))
                (recur)))))
        p)))
 
@@ -724,7 +696,6 @@
   [coll ch]
   (reduce conj coll ch))
 
-
 (defn take
   "Returns a channel that will return, at most, n items from ch. After n items
    have been returned, or ch has been closed, the return chanel will close.
@@ -743,12 +714,117 @@
            (close! out))
        out)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; deprecated - do not use ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn map<
+  "Deprecated - this function will be removed. Use transducer instead"
+  [f ch]
+  (reify
+   impl/Channel
+   (close! [_] (impl/close! ch))
+   (closed? [_] (impl/closed? ch))
+
+   impl/ReadPort
+   (take! [_ fn1]
+     (let [ret
+       (impl/take! ch
+         (reify
+          impl/Handler
+          (active? [_] (impl/active? fn1))
+          #_(lock-id [_] (impl/lock-id fn1))
+          (commit [_]
+           (let [f1 (impl/commit fn1)]
+             #(f1 (if (nil? %) nil (f %)))))))]
+       (if (and ret (not (nil? @ret)))
+         (channels/box (f @ret))
+         ret)))
+
+   impl/WritePort
+   (put! [_ val fn1] (impl/put! ch val fn1))))
+
+(defn map>
+  "Deprecated - this function will be removed. Use transducer instead"
+  [f ch]
+  (reify
+   impl/Channel
+   (close! [_] (impl/close! ch))
+
+   impl/ReadPort
+   (take! [_ fn1] (impl/take! ch fn1))
+
+   impl/WritePort
+   (put! [_ val fn1]
+     (impl/put! ch (f val) fn1))))
+
+(defn filter>
+  "Deprecated - this function will be removed. Use transducer instead"
+  [p ch]
+  (reify
+   impl/Channel
+   (close! [_] (impl/close! ch))
+   (closed? [_] (impl/closed? ch))
+
+   impl/ReadPort
+   (take! [_ fn1] (impl/take! ch fn1))
+
+   impl/WritePort
+   (put! [_ val fn1]
+    (if (p val)
+      (impl/put! ch val fn1)
+      (channels/box (not (impl/closed? ch)))))))
+
+(defn remove>
+  "Deprecated - this function will be removed. Use transducer instead"
+  [p ch]
+  (filter> (complement p) ch))
+
+(defn filter<
+  "Deprecated - this function will be removed. Use transducer instead"
+  ([p ch] (filter< p ch nil))
+  ([p ch buf-or-n]
+     (let [out (chan buf-or-n)]
+       (go-loop []
+         (let [val (<! ch)]
+           (if (nil? val)
+             (close! out)
+             (do (when (p val)
+                   (>! out val))
+                 (recur)))))
+       out)))
+
+(defn remove<
+  "Deprecated - this function will be removed. Use transducer instead"
+  ([p ch] (remove< p ch nil))
+  ([p ch buf-or-n] (filter< (complement p) ch buf-or-n)))
+
+(defn- mapcat* [f in out]
+  (go-loop []
+    (let [val (<! in)]
+      (if (nil? val)
+        (close! out)
+        (do (doseq [v (f val)]
+              (>! out v))
+            (when-not (impl/closed? out)
+              (recur)))))))
+
+(defn mapcat<
+  "Deprecated - this function will be removed. Use transducer instead"
+  ([f in] (mapcat< f in nil))
+  ([f in buf-or-n]
+    (let [out (chan buf-or-n)]
+      (mapcat* f in out)
+      out)))
+
+(defn mapcat>
+  "Deprecated - this function will be removed. Use transducer instead"
+  ([f out] (mapcat> f out nil))
+  ([f out buf-or-n]
+     (let [in (chan buf-or-n)]
+       (mapcat* f in out)
+       in)))
 
 (defn unique
-  "Returns a channel that will contain values from ch. Consecutive duplicate
-   values will be dropped.
-
-  The output channel is unbuffered by default, unless buf-or-n is given."
+  "Deprecated - this function will be removed. Use transducer instead"
   ([ch]
      (unique ch nil))
   ([ch buf-or-n]
@@ -763,13 +839,8 @@
            (close! out))
        out)))
 
-
 (defn partition
-  "Returns a channel that will contain vectors of n items taken from ch. The
-   final vector in the return channel may be smaller than n if ch closed before
-   the vector could be completely filled.
-
-   The output channel is unbuffered by default, unless buf-or-n is given"
+  "Deprecated - this function will be removed. Use transducer instead"
   ([n ch]
      (partition n ch nil))
   ([n ch buf-or-n]
@@ -791,11 +862,7 @@
 
 
 (defn partition-by
-  "Returns a channel that will contain vectors of items taken from ch. New
-   vectors will be created whenever (f itm) returns a value that differs from
-   the previous item's (f itm).
-
-  The output channel is unbuffered, unless buf-or-n is given"
+  "Deprecated - this function will be removed. Use transducer instead"
   ([f ch]
      (partition-by f ch nil))
   ([f ch buf-or-n]

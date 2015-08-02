@@ -14,10 +14,12 @@
   (take! [port fn1-handler] "derefable val if taken, nil if take was enqueued"))
 
 (defprotocol WritePort
-  (put! [port val fn0-handler] "derefable nil if put, nil if put was enqueued. Must throw on nil val."))
+  (put! [port val fn1-handler] "derefable boolean (false if already closed) if handled, nil if put was enqueued.
+                               Must throw on nil val."))
 
 (defprotocol Channel
-  (close! [chan]))
+  (close! [chan])
+  (closed? [chan]))
 
 (defprotocol Handler
   (active? [h] "returns true if has callback. Must work w/o lock")
@@ -27,7 +29,13 @@
 (defprotocol Buffer
   (full? [b])
   (remove! [b])
-  (add! [b itm]))
+  (add!* [b itm]))
+
+(defn add!
+  ([b] b)
+  ([b itm]
+     (assert (not (nil? itm)))
+     (add!* b itm)))
 
 ;; Defines a buffer that will never block (return true to full?)
 (defprotocol UnblockingBuffer)

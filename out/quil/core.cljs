@@ -7,19 +7,16 @@
                        
                          
                                         
-                                                                                                                     
-                                                                                       
+                                                                                                                           
+                                                               
                                                                                                                
 
       
 (ns quil.core
   (:require clojure.string
-            [quil.sketch :as applet]
-            [clojure.browser.dom  :as dom])
-  (:use-macros [quil.sketch :only [defsketch]]
-               [quil.util :only [generate-quil-constants]])
-  (:use [quil.sketch :only [current-applet resolve-renderer]]
-        [quil.util :only [resolve-constant-key]]))
+            org.processingjs.Processing
+            [quil.sketch :as applet :refer [current-applet resolve-renderer]]
+            [quil.util :as u :refer [resolve-constant-key] :include-macros true]))
 
 (def ^{:dynamic true
        :private true}
@@ -44,7 +41,7 @@
 
 ;; -------------------- PConstants section -----------------------
 
-(generate-quil-constants
+(u/generate-quil-constants                   :cljs
  arc-modes (:open :chord :pie)
  shape-modes (:points :lines :triangles :triangle-fan :triangle-strip :quads :quad-strip)
  blend-modes (:blend :add :subtract :darkest :lightest :difference :exclusion :multiply
@@ -317,7 +314,7 @@
   alpha
   "Extracts the alpha value from a color."
   [color]
-  (.alpha (current-graphics) (int color)))
+  (.alpha (current-graphics) (unchecked-int color)))
 
 (defn
   ^{:requires-bindings true
@@ -480,32 +477,32 @@
   returned as a float in the range from PI to -PI. The atan2 function
   is most often used for orienting geometry to the position of the
   cursor. Note: The y-coordinate of the point is the first parameter
-  and the x-coordinate is the second due the the structure of
+  and the x-coordinate is the second due to the structure of
   calculating the tangent."
   [y x]
                                            
          (.atan2 (current-applet) y x))
 
-     
-     
-                            
-                                   
-                          
-                                       
-                 
-                 
-                                                              
-                    
+(defn
+  ^{:requires-bindings false
+    :processing-name "PFont.list()"
+    :category "Typography"
+    :subcategory "Loading & Displaying"
+    :added "1.0"}
+  available-fonts
+  "A sequence of strings representing the fonts on this system
+  available for use.
 
-                                                                    
-                                                                     
-                                                                    
-                                                                      
-                                                                      
-                                                                      
+  Because of limitations in Java, not all fonts can be used and some
+  might work with one operating system and not others. When sharing a
+  sketch with other people or posting it on the web, you may need to
+  include a .ttf or .otf version of your font in the data directory of
+  the sketch because other people might not have the font installed on
+  their computer. Only fonts that can legally be distributed should be
+  included with a sketch."
+  []
                           
-    
-                     
+         (seq (.list js/PFont)))
 
 (defn
   ^{:requires-bindings true
@@ -542,8 +539,8 @@
   It is not possible to use transparency (alpha) in background colors
   with the main drawing surface, however they will work properly with
   create-graphics. Converts rgb to an int and alpha to a float."
-  ([rgb] (.background (current-graphics) (int rgb)))
-  ([rgb alpha] (.background (current-graphics) (int rgb) (float alpha))))
+  ([rgb] (.background (current-graphics) (unchecked-int rgb)))
+  ([rgb alpha] (.background (current-graphics) (unchecked-int rgb) (float alpha))))
 
 (defn
   ^{:requires-bindings true
@@ -656,10 +653,7 @@
 
   Transformations such as translate, rotate, and scale do not work
   within begin-shape. It is also not possible to use other shapes,
-  such as ellipse or rect within begin-shape.
-
-  Doesn't work inside with-graphics macro: shape is not drawn on
-  provided graphics."
+  such as ellipse or rect within begin-shape."
   ([] (.beginShape (current-graphics)))
   ([mode]
      (let [mode (resolve-constant-key mode shape-modes)]
@@ -865,8 +859,8 @@
                 Photoshop."
   [c1 c2 mode]
   (let [mode (resolve-constant-key mode blend-modes)]
-                                                           )
-           (.blendColor (current-graphics) c1 c2 mode))
+                                                                               
+           (.blendColor (current-graphics) c1 c2 mode)))
 
      
      
@@ -913,7 +907,7 @@
   "Extracts the blue value from a color, scaled to match current color-mode.
   Returns a float."
   [color]
-  (.blue (current-graphics) (int color)))
+  (.blue (current-graphics) (unchecked-int color)))
 
 (defn
   ^{:requires-bindings true
@@ -935,7 +929,7 @@
   brightness
   "Extracts the brightness value from a color. Returns a float."
   [color]
-  (.brightness (current-graphics) (int color)))
+  (.brightness (current-graphics) (unchecked-int color)))
 
 (defn
   ^{:requires-bindings true
@@ -1180,6 +1174,10 @@
   to use create-graphics with the :opengl renderer, because it doesn't
   allow offscreen use. The :pdf renderer requires the filename parameter.
 
+  Note: don't use create-graphics in draw in clojurescript, it leaks memory.
+  You should create graphic in setup and reuse it in draw instead of creating
+  a new one.
+
   It's important to call any drawing commands between (.beginDraw graphics) and
   (.endDraw graphics) statements or use with-graphics macro. This is also true
   for any commands that affect drawing, such as smooth or color-mode.
@@ -1371,12 +1369,12 @@
   curve-vertex
   "Specifies vertex coordinates for curves. This function may only be
   used between begin-shape and end-shape and only when there is no
-  mode keyword specified to begin-hape. The first and last points in a
+  mode keyword specified to begin-shape. The first and last points in a
   series of curve-vertex lines will be used to guide the beginning and
   end of a the curve. A minimum of four points is required to draw a
   tiny curve between the second and third points. Adding a fifth point
-  with curveVertex will draw the curve between the second, third, and
-  fourth points. The curveVertex function is an implementation of
+  with curve-vertex will draw the curve between the second, third, and
+  fourth points. The curve-vertex function is an implementation of
   Catmull-Rom splines."
   ([x y] (.curveVertex (current-graphics) (float x) (float y)))
   ([x y z] (.curveVertex (current-graphics) (float x) (float y) (float z))))
@@ -1437,7 +1435,7 @@
   directional-light
   "Adds a directional light. Directional light comes from one
   direction and is stronger when hitting a surface squarely and weaker
-  if it hits at a a gentle angle. After hitting a surface, a
+  if it hits at a gentle angle. After hitting a surface, a
   directional lights scatters in all directions. Lights need to be
   included in the draw fn to remain persistent in a looping
   program. Placing them in the setup fn of a looping program will cause
@@ -1596,12 +1594,12 @@
   all of image data defined since the previous call to begin-shape is
   written into the image buffer. The keyword :close may be passed to
   close the shape (to connect the beginning and the end)."
-  ([] (.endShape (current-applet)))
+  ([] (.endShape (current-graphics)))
   ([mode]
      (when-not (= :close mode)
                                                                                        
               nil)
-     (.endShape (current-applet)
+     (.endShape (current-graphics)
                                    
                        2)))
 
@@ -1655,8 +1653,8 @@
     :added "1.0"}
   fill-int
   "Sets the color used to fill shapes."
-  ([rgb] (.fill (current-graphics) (int rgb)))
-  ([rgb alpha] (.fill (current-graphics) (int rgb) (float alpha))))
+  ([rgb] (.fill (current-graphics) (unchecked-int rgb)))
+  ([rgb alpha] (.fill (current-graphics) (unchecked-int rgb) (float alpha))))
 
 (defn
   ^{:requires-bindings true
@@ -1762,7 +1760,7 @@
   frame-count
   "The system variable frameCount contains the number of frames
   displayed since the program started. Inside setup() the value is 0
-  and and after the first iteration of draw it is 1, etc."
+  and after the first iteration of draw it is 1, etc."
   []
                                       
          (.-frameCount (current-applet)))
@@ -1850,7 +1848,7 @@
   color-mode. This value is always returned as a float so be careful
   not to assign it to an int value."
   [col]
-  (.green (current-graphics) (int col)))
+  (.green (current-graphics) (unchecked-int col)))
 
 (defn
   ^{:require-binding false
@@ -1974,7 +1972,7 @@
   hue
   "Extracts the hue value from a color."
   [col]
-  (.hue (current-graphics) (int col)))
+  (.hue (current-graphics) (unchecked-int col)))
 
 
 (defn
@@ -2144,7 +2142,7 @@
   the two values where 0.0 equal to the first point, 0.1 is very near
   the first point, 0.5 is half-way in between, etc."
   [c1 c2 amt]
-  (.lerpColor (current-graphics) (int c1) (int c2) (float amt)))
+  (.lerpColor (current-graphics) (unchecked-int c1) (unchecked-int c2) (float amt)))
 
 (defn
   ^{:requires-bindings false
@@ -2779,13 +2777,20 @@
   "Array containing the values for all the pixels in the display
   window or image. This array is therefore the size of the display window. If
   this array is modified, the update-pixels fn must be called to update
-  the changes. Calls .loadPixels before obtaining the pixel array.
-
-  Only works with P2D and P3D renderer if used without arguments."
+  the changes. Calls .loadPixels before obtaining the pixel array."
   ([] (pixels (current-graphics)))
-  ([^PImage img]
-    (.loadPixels img)
-    (.-pixels img)))
+
+       
+                
+                    
+                  
+
+        
+  ([img]
+   (.loadPixels img)
+   (let [pix-array (.toArray (.-pixels img))]
+     (set! (.-stored-pix-array img) pix-array)
+     pix-array)))
 
 (defn
   ^{:requires-bindings true
@@ -3034,7 +3039,7 @@
   zero and the value of the high parameter. The function call (random
   5) returns values between 0 and 5 (starting at zero, up to but not
   including 5). If two parameters are passed, it will return a float
-  with a value between the the parameters. The function call
+  with a value between the parameters. The function call
   (random -5 10.2) returns values starting at -5 up to (but not
   including) 10.2."
   ([max] (.random (current-applet) (float max)))
@@ -3156,7 +3161,7 @@
   red
   "Extracts the red value from a color, scaled to match current color-mode."
   [c]
-  (.red (current-graphics) (int c)))
+  (.red (current-graphics) (unchecked-int c)))
 
 (defn
   ^{:requires-bindings true
@@ -3363,7 +3368,7 @@
   saturation
   "Extracts the saturation value from a color."
   [c]
-  (.saturation (current-graphics) (int c)))
+  (.saturation (current-graphics) (unchecked-int c)))
 
 (defn
   ^{:requires-bindings true
@@ -3433,11 +3438,6 @@
                                       
 
      
-                                       
-                                
-                     
-
-     
      
                             
                                    
@@ -3447,12 +3447,7 @@
               
                                                    
     
-                    
-
-     
-                                        
-                                
-                      
+                            
 
      
      
@@ -3464,7 +3459,7 @@
                
                                                     
     
-                     
+                             
 
 (defn
   ^{:requires-bindings true
@@ -3858,8 +3853,8 @@
   stroke-int
   "Sets the color used to draw lines and borders around
   shapes. Converts rgb to int and alpha to a float."
-  ([rgb] (.stroke (current-graphics) (int rgb)))
-  ([rgb alpha] (.stroke (current-graphics) (int rgb) (float alpha))))
+  ([rgb] (.stroke (current-graphics) (unchecked-int rgb)))
+  ([rgb alpha] (.stroke (current-graphics) (unchecked-int rgb) (float alpha))))
 
 (defn
   ^{:requires-bindings true
@@ -4115,12 +4110,12 @@
   In the default configuration (the :model mode), it's possible to
   rotate, scale, and place letters in two and three dimensional space.
 
-  The :shape mode draws text using the the glyph outlines of
-  individual characters rather than as textures. This mode is only
-  only supported with the PDF and OPENGL renderer settings. With the
-  PDF renderer, you must specify the :shape text-mode before any other
-  drawing occurs. If the outlines are not available, then
-  :shape will be ignored and :model will be used instead.
+  The :shape mode draws text using the glyph outlines of individual
+  characters rather than as textures. This mode is only supported with
+  the PDF and OPENGL renderer settings. With the PDF renderer, you
+  must specify the :shape text-mode before any other drawing occurs.
+  If the outlines are not available, then :shape will be ignored and
+  :model will be used instead.
 
   The :shape option in OPENGL mode can be combined with begin-raw to
   write vector-accurate text to 2D and 3D output files, for instance
@@ -4162,26 +4157,25 @@
          [img]
   (.texture (current-graphics) img))
 
-     
-     
-                             
-                                     
-                      
-                          
-                  
-              
-                                                               
-                              
+(defn
+    ^{:requires-bindings true
+     :processing-name "textureMode()"
+     :category "Shape"
+     :subcategory "Vertex"
+     :added "1.0"}
+  texture-mode
+  "Sets the coordinate space for texture mapping. There are two
+  options, :image and :normal.
 
-                                                                  
-                                                                 
-                                                                     
-                                                                    
-                                                             
-                                           
-        
-                                                       
-                                                  
+  :image refers to the actual coordinates of the image and :normal
+  refers to a normalized space of values ranging from 0 to 1. The
+  default mode is :image. In :image, if an image is 100 x 200 pixels,
+  mapping the image onto the entire size of a quad would require the
+  points (0,0) (0,100) (100,200) (0,200). The same mapping in
+  NORMAL_SPACE is (0,0) (0,1) (1,1) (0,1)."
+  [mode]
+  (let [mode (resolve-constant-key mode texture-modes)]
+    (.textureMode (current-graphics) (int mode))))
 
      
      
@@ -4254,8 +4248,8 @@
   maximum value is 255.
 
   Also used to control the coloring of textures in 3D."
-  ([rgb] (.tint (current-graphics) (int rgb)))
-  ([rgb alpha] (.tint (current-graphics) (int rgb) (float alpha))))
+  ([rgb] (.tint (current-graphics) (unchecked-int rgb)))
+  ([rgb alpha] (.tint (current-graphics) (unchecked-int rgb) (float alpha))))
 
 (defn
   ^{:requires-bindings true
@@ -4366,7 +4360,14 @@
   renderer may not seem to use this function in the current Processing
   release, this will always be subject to change."
   ([] (update-pixels (current-graphics)))
-  ([^PImage img] (.updatePixels img)))
+                                           
+
+        
+  ([img]
+   (when-let [pix-array (.-stored-pix-array img)]
+     (.set (.-pixels img) pix-array)
+     (set! (.-stored-pix-array img) nil))
+   (.updatePixels img)))
 
 (defn
   ^{:requires-bindings true
@@ -4474,9 +4475,11 @@
                              
                                  
                   
-                    
-           
-                   
+         
+                      
+             
+               
+                         
 
      
          
@@ -4495,9 +4498,11 @@
                    
                        
                   
-                       
-           
-                   
+         
+                         
+             
+                  
+                            
 
          
                            
@@ -4573,6 +4578,12 @@
                                  call function created defsketch.
                                  Supported only in clojurescript.
 
+                     :global-key-events - Allows a sketch to receive any
+                                          keyboard event sent to the page,
+                                          regardless of whether the canvas it is
+                                          loaded in has focus or not.
+                                          Supported only in clojurescript.
+
                      Usage example: :features [:keep-on-top :present]
 
    :bgcolor        - Sets background color for unused space in present mode.
@@ -4589,6 +4600,13 @@
    :draw           - A function to be repeatedly called at most n times per
                      second where n is the target frame-rate set for
                      the visualisation.
+
+   :host           - String id of canvas element or DOM element itself.
+                     Specifies host for the sketch. Must be specified in sketch,
+                     may be omitted in defsketch. If ommitted in defsketch,
+                     :host is set to the name of the sketch. If element with
+                     specified id is not found on the page and page is empty -
+                     new canvas element will be created. Used in clojurescript.
 
    :focus-gained   - Called when the sketch gains focus.
                      Not supported in clojurescript.

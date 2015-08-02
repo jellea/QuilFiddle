@@ -1,12 +1,1 @@
-{"version":3,
- "file":
- "/Users/atonaal/Dev/current/quilfiddle/out/quil/middleware.js",
- "sources":["middleware.cljs"],
- "lineCount":78,
- "mappings":
- ";AAAA;;;;;;AAOA;;;;;2BAAA,4BAAA,vDAAMA,8CAIHC,SACD,OAACC,6CAAkBD;;AAWrB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;gCAAA,iCAAA,jEAAME,wDA2DHF,SACD,OAACG,uDAA4BH",
- "names":
- ["quil.middleware/fun-mode", "options",
-  "quil.middlewares.fun-mode/fun-mode",
-  "quil.middleware/navigation-3d",
-  "quil.middlewares.navigation-3d/navigation-3d"]}
+{"version":3,"file":"\/Users\/jelleakkerman\/Dev\/archive\/quilfiddle\/out\/quil\/middleware.js","sources":["middleware.cljs"],"lineCount":118,"mappings":";;;;;;;;;;;AAQMA,8DAIHC;OACAC,mCAAkBD;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAWfE,wEAiEHF;OACAG,6CAA4BH;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAEzBI,wEA8BHJ;OACAK,6CAA4BL","names":["quil.middleware\/fun-mode","options","quil.middlewares.fun-mode\/fun-mode","quil.middleware\/navigation-3d","quil.middlewares.navigation-3d\/navigation-3d","quil.middleware\/navigation-2d","quil.middlewares.navigation-2d\/navigation-2d"]}

@@ -1,32 +1,50 @@
 (ns quil.sketch
-  (:require [clojure.browser.dom  :as dom]
-            [quil.util :refer [no-fn resolve-constant-key]]
-            [quil.middlewares.deprecated-options :refer [deprecated-options]])
-  (:use-macros [quil.sketch :only [with-sketch]]
-               [quil.helpers.tools :only [bind-handlers]]
-               [quil.util :only [generate-quil-constants]]))
+  (:require [quil.util :as u :include-macros true]
+            [quil.middlewares.deprecated-options :refer [deprecated-options]]
+            [goog.dom :as dom]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType])
+  (:use-macros [quil.sketch :only [with-sketch]]))
 
 (def ^:dynamic
   *applet* nil)
 
 (defn current-applet [] *applet*)
 
-(generate-quil-constants
+(u/generate-quil-constants :cljs
   rendering-modes (:java2d :p2d :p3d :opengl))
 
 (defn resolve-renderer [mode]
-  (resolve-constant-key mode rendering-modes))
+  (u/resolve-constant-key mode rendering-modes))
 
 (defn size
   ([width height]
     (.size (current-applet) (int width) (int height)))
 
   ([width height mode]
-    (.size (current-applet) (int width) (int height) (resolve-constant-key mode rendering-modes))))
+    (.size (current-applet) (int width) (int height) (u/resolve-constant-key mode rendering-modes))))
 
-(def ^{:private true}
-  supported-features
-  #{:no-start})
+(defn- bind-handlers [prc opts]
+  (doseq [[processing-name quil-name] {:setup :setup
+                                       :draw :draw
+
+                                       :keyPressed :key-pressed
+                                       :keyReleased :key-released
+                                       :keyTyped :key-typed
+
+                                       :mouseClicked :mouse-clicked
+                                       :mouseDragged :mouse-dragged
+                                       :mouseMoved :mouse-moved
+                                       :mousePressed :mouse-pressed
+                                       :mouseReleased :mouse-released
+                                       :mouseOut :mouse-exited
+                                       :mouseOver :mouse-entered
+                                       :mouseScrolled :mouse-wheel}]
+        (when-let [handler (opts quil-name)]
+          (aset prc (name processing-name)
+                (fn []
+                  (with-sketch prc
+                    (handler)))))))
 
 (defn make-sketch [options]
   (let [opts            (->> (:middleware options [])
@@ -35,66 +53,51 @@
                           (#(% options))
                           (merge {:size [500 300]}))
 
-        draw-fn         (or (:draw opts) no-fn)
-        setup-fn        (or (:setup opts) no-fn)
-
         sketch-size     (or (:size opts) [200 200])
         renderer        (:renderer opts)
+        features        (set (:features opts))
 
-        key-pressed     (or (:key-pressed opts) no-fn)
-        key-released    (or (:key-released opts) no-fn)
-        key-typed       (or (:key-typed opts) no-fn)
+        opts (-> opts
+                 (update-in [:setup]
+                            #(fn []
+                               (->> (if renderer [renderer] [])
+                                    (concat sketch-size)
+                                    (apply size))
+                               (when % (%))))
+                 (update-in [:mouse-wheel]
+                            #(when %
+                               (fn []
+                                 ;; -1 need for compability to Clojure version
+                                 (% (* -1 (.-mouseScroll *applet*)))))))
+        attach-function (fn [prc]
+                          (bind-handlers prc opts)
+                          (set! (.-quil prc) (atom nil))
+                          (set! (.-target-frame-rate prc) (atom 60)))
+        sketch (js/Processing.Sketch. attach-function)]
+    (when (contains? features :global-key-events)
+      (aset (aget sketch "options") "globalKeyEvents" true))
+    sketch))
 
-        mouse-clicked   (or (:mouse-clicked opts) no-fn)
-        mouse-dragged   (or (:mouse-dragged opts) no-fn)
-        mouse-moved     (or (:mouse-moved opts) no-fn)
-        mouse-pressed   (or (:mouse-pressed opts) no-fn)
-        mouse-released  (or (:mouse-released opts) no-fn)
-        mouse-out       (or (:mouse-exited opts) no-fn)
-        mouse-over      (or (:mouse-entered opts) no-fn)
-        mouse-scrolled  (or (:mouse-wheel opts) (fn [x] ))]
-    (fn [prc]
-      (bind-handlers prc
-                     :setup  (do
-                                (apply size (concat sketch-size (if renderer [renderer] [])))
-                                (setup-fn))
-                     :draw draw-fn
-
-                     :keyPressed key-pressed
-                     :keyReleased key-released
-                     :keyTyped key-typed
-
-                     :mouseClicked mouse-clicked
-                     :mouseDragged mouse-dragged
-                     :mouseMoved mouse-moved
-                     :mousePressed mouse-pressed
-                     :mouseReleased mouse-released
-                     :mouseOut mouse-out
-                     :mouseOver mouse-over
-                     :mouseScrolled (mouse-scrolled (* -1 (.-mouseScroll prc)))) ;; -1 need for compability to Clojure version
-      (set! (.-quil prc) (atom nil))
-      (set! (.-target-frame-rate prc) (atom 60)))))
-
-(defn sketch
-  [& opts]
+(defn sketch [& opts]
   (let [opts-map (apply hash-map opts)
-        host-elem (dom/get-element (:host opts-map))
-        processing-fn (make-sketch opts-map)]
-    (when host-elem
-      (js/Processing. host-elem processing-fn))))
-
+        host-elem (dom/getElement (:host opts-map))
+        renderer (or (:renderer opts-map) :p2d)]
+    (if host-elem
+      (do
+        (if (.-processing-context host-elem)
+          (when-not (= renderer (.-processing-context host-elem))
+            (.warn js/console "WARNING: Using different context on one canvas!"))
+          (set! (.-processing-context host-elem) renderer))
+        (js/Processing. host-elem (make-sketch opts-map)))
+      (.warn js/console "WARNING: Cannot create sketch. :host is not specified."))))
 
 (def sketch-init-list (atom (list )))
 
-(defn add-js-event [event fun]
-  (if (.-addEventListener js/window)
-      (.addEventListener js/window event fun false)
-      (if (.-attachEvent js/window)
-          (.attachEvent js/window (str "on" event) fun))))
-
 (defn empty-body? []
   (let [child (.-childNodes (.-body js/document))]
-    (= 1 (.-length child))))
+    ; seems hacky, we should come up with better way of
+    ; checking whether body is empty or not
+    (<= (.-length child) 1)))
 
 (defn add-canvas [canvas-id]
   (let [canvas (.createElement js/document "canvas")]
@@ -111,4 +114,4 @@
 (defn add-sketch-to-init-list [sk]
   (swap! sketch-init-list conj sk))
 
-(add-js-event "load" init-sketches)
+(events/listenOnce js/window EventType/LOAD init-sketches)
