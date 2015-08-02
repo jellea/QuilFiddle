@@ -49,9 +49,9 @@
     :host \"canvas\"
     :size [window.innerWidth window.innerHeight]
     :setup setup
-    :draw draw
-    :update update!
-    :mouse-moved mouse-moved
+    :draw #(draw %)
+    :update #(update! %)
+    :mouse-moved #(mouse-moved %1 %2)
     :middleware [m/fun-mode]))
 
 (my-sketch)")
