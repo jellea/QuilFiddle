@@ -1990,6 +1990,7 @@ cljs.core.cst$kw$f2 = new cljs.core.Keyword(null,"f2","f2",396168596);
 cljs.core.cst$sym$cljs$core_SLASH_first_DASH_array_DASH_for_DASH_longvec = new cljs.core.Symbol("cljs.core","first-array-for-longvec","cljs.core/first-array-for-longvec",-2042521196,null);
 cljs.core.cst$sym$aseq = new cljs.core.Symbol(null,"aseq","aseq",-1865515628,null);
 cljs.core.cst$sym$js_SLASH_Error$ = new cljs.core.Symbol("js","Error.","js/Error.",750655924,null);
+cljs.core.cst$kw$eval_DASH_form = new cljs.core.Keyword(null,"eval-form","eval-form",-1934118476);
 cljs.core.cst$kw$ns_DASH_var_DASH_clash = new cljs.core.Keyword(null,"ns-var-clash","ns-var-clash",-280494668);
 cljs.core.cst$sym$cljs$core_SLASH_Stepper = new cljs.core.Symbol("cljs.core","Stepper","cljs.core/Stepper",368247252,null);
 cljs.core.cst$sym$cljs$core_SLASH_reify = new cljs.core.Symbol("cljs.core","reify","cljs.core/reify",463577556,null);

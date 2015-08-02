@@ -3,7 +3,10 @@
             [cljs.js :as cljs]
             [cljs.tools.reader :as r]
             [cljsjs.codemirror.mode.clojure]
-            ;[cljsjs.codemirror.addons.matchbrackets]
+            [cljsjs.codemirror.addons.matchbrackets]
+            [cljsjs.codemirror.addons.anywordhint]
+            [cljsjs.codemirror.addons.closebrackets]
+            [cljsjs.codemirror.addons.showhint]
             [quil.core]
             [quil.middleware]))
 
@@ -12,9 +15,9 @@
 ; TODO: alt+cmd+enter: eval all
 
 (def default-code "; QuilFiddle
-; Live code Processing/Quil in the browser
+; Live code Processing/Quil in the browser!
 
-; cmd+enter: eval current line/selection
+; cmd+enter: evaluates current line/selection
 ; tab: autocomplete
 
 ; WIP: Eval works (see console), Quil almost...
@@ -60,7 +63,10 @@
 
 (def st (cljs/empty-state))
 
+
+
 (defn eval [in-str]
+  (prn "eval: " in-str)
   (cljs/eval-str st in-str 'fiddle.runtime
                  {:eval cljs/js-eval :source-map true :ns 'fiddle.runtime}
                  (fn [{:keys [error value]}]
@@ -69,21 +75,40 @@
                      (do
                        (.error js/console error))))))
 
-(defn eval-code [cm]
-  (let [doc (.-doc cm)]
-    (if (.somethingSelected doc)
-      (eval (.getSelection doc))
-      (eval (.getLine doc (-> doc .getCursor .-line))))))
+(defn eval-sexp [cm]
+  (if-not (-> cm (.getTokenAt (.getCursor cm))
+              .-state
+              .-indentStack)
+
+    (prn "not in from")
+
+    (do
+      (while (-> cm (.getTokenAt (.getCursor cm))
+                 .-state
+                 .-indentStack)
+        (.moveH cm -1 "char"))
+
+      (let [start (.getCursor cm)]
+        (.moveH cm 1 "char")
+        (while (-> cm (.getTokenAt (.getCursor cm))
+                   .-state
+                   .-indentStack)
+          (.moveH cm 1 "char"))
+        (let [end (.getCursor cm)]
+
+          (.setSelection cm start end)
+
+          (eval (.getSelection cm)))))))
 
 (let [cm (js/CodeMirror (.getElementById js/document "editor")
                #js {:value default-code
                     :mode "clojure"
-                    :extraKeys #js {                        ;:Cmd-Alt-Enter #(eval-code (.getValue %))
-                                    :Cmd-Enter #(eval-code %)
+                    :extraKeys #js {:Cmd-Enter #(eval-sexp %)
                                     :Tab "autocomplete"}
                     ;:lineNumbers true
                     :gutters #js ["CodeMirror-linenumbers"]
                     :autofocus true
+                    :autoCloseBrackets true
                     :styleActiveLine true
                     :matchBrackets true
                     :theme "paraiso-dark"})]
