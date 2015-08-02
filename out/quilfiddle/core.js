@@ -12,11 +12,11 @@ quilfiddle.core.default_code = "; QuilFiddle\n; Live code Processing/Quil in the
 window.cljs.user = {};
 quilfiddle.core.st = cljs.js.empty_state.cljs$core$IFn$_invoke$arity$0();
 quilfiddle.core.eval = (function quilfiddle$core$eval(in_str){
-return cljs.js.eval_str.cljs$core$IFn$_invoke$arity$5(quilfiddle.core.st,in_str,cljs.core.cst$sym$fiddle$runtime,new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$eval,cljs.js.js_eval,cljs.core.cst$kw$source_DASH_map,true], null),(function (p__17844){
-var map__17845 = p__17844;
-var map__17845__$1 = ((((!((map__17845 == null)))?((((map__17845.cljs$lang$protocol_mask$partition0$ & (64))) || (map__17845.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__17845):map__17845);
-var error = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17845__$1,cljs.core.cst$kw$error);
-var value = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17845__$1,cljs.core.cst$kw$value);
+return cljs.js.eval_str.cljs$core$IFn$_invoke$arity$5(quilfiddle.core.st,in_str,cljs.core.cst$sym$fiddle$runtime,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$eval,cljs.js.js_eval,cljs.core.cst$kw$source_DASH_map,true,cljs.core.cst$kw$ns,cljs.core.cst$sym$fiddle$runtime], null),(function (p__6297){
+var map__6298 = p__6297;
+var map__6298__$1 = ((((!((map__6298 == null)))?((((map__6298.cljs$lang$protocol_mask$partition0$ & (64))) || (map__6298.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__6298):map__6298);
+var error = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__6298__$1,cljs.core.cst$kw$error);
+var value = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__6298__$1,cljs.core.cst$kw$value);
 if(cljs.core.not(error)){
 return console.log(value);
 } else {
@@ -32,26 +32,26 @@ return quilfiddle.core.eval(doc.getSelection());
 return quilfiddle.core.eval(doc.getLine(doc.getCursor().line));
 }
 });
-var cm_17852 = (function (){var G__17848 = document.getElementById("editor");
-var G__17849 = {"value": quilfiddle.core.default_code, "mode": "clojure", "extraKeys": {"Cmd-Enter": ((function (G__17848){
-return (function (p1__17847_SHARP_){
-return quilfiddle.core.eval_code(p1__17847_SHARP_);
-});})(G__17848))
+var cm_6305 = (function (){var G__6301 = document.getElementById("editor");
+var G__6302 = {"value": quilfiddle.core.default_code, "mode": "clojure", "extraKeys": {"Cmd-Enter": ((function (G__6301){
+return (function (p1__6300_SHARP_){
+return quilfiddle.core.eval_code(p1__6300_SHARP_);
+});})(G__6301))
 , "Tab": "autocomplete"}, "gutters": ["CodeMirror-linenumbers"], "autofocus": true, "styleActiveLine": true, "matchBrackets": true, "theme": "paraiso-dark"};
-return CodeMirror(G__17848,G__17849);
+return CodeMirror(G__6301,G__6302);
 })();
-var G__17850_17853 = "clojure";
-var G__17851_17854 = cljs.core.clj__GT_js(new cljs.core.PersistentArrayMap(null, 1, [cljs.core.cst$kw$hint_DASH_pattern,/[\w\-\>\:\*\$\?\<\!\+\.\\/foo]/], null));
-CodeMirror.extendMode(G__17850_17853,G__17851_17854);
+var G__6303_6306 = "clojure";
+var G__6304_6307 = cljs.core.clj__GT_js(new cljs.core.PersistentArrayMap(null, 1, [cljs.core.cst$kw$hint_DASH_pattern,/[\w\-\>\:\*\$\?\<\!\+\.\\/foo]/], null));
+CodeMirror.extendMode(G__6303_6306,G__6304_6307);
 quilfiddle.core.load = (function quilfiddle$core$load(lib,cb){
-var G__17856 = new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$lang,cljs.core.cst$kw$clj,cljs.core.cst$kw$source,[cljs.core.str(cljs.core.cst$sym$quil$core),cljs.core.str(cljs.core.cst$sym$quil$middleware)].join('')], null);
-return (cb.cljs$core$IFn$_invoke$arity$1 ? cb.cljs$core$IFn$_invoke$arity$1(G__17856) : cb.call(null,G__17856));
+var G__6309 = new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$lang,cljs.core.cst$kw$clj,cljs.core.cst$kw$source,[cljs.core.str(cljs.core.cst$sym$quil$core),cljs.core.str(cljs.core.cst$sym$quil$middleware)].join('')], null);
+return (cb.cljs$core$IFn$_invoke$arity$1 ? cb.cljs$core$IFn$_invoke$arity$1(G__6309) : cb.call(null,G__6309));
 });
-cljs.js.eval_str.cljs$core$IFn$_invoke$arity$5(quilfiddle.core.st,[cljs.core.str("(ns fiddle.runtime (:require [quil.core :as q] [quil.middleware :as m])) "),cljs.core.str(quilfiddle.core.default_code)].join(''),cljs.core.cst$sym$fiddle$runtime,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$eval,cljs.js.js_eval,cljs.core.cst$kw$load,quilfiddle.core.load,cljs.core.cst$kw$source_DASH_map,true], null),(function (p__17857){
-var map__17858 = p__17857;
-var map__17858__$1 = ((((!((map__17858 == null)))?((((map__17858.cljs$lang$protocol_mask$partition0$ & (64))) || (map__17858.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__17858):map__17858);
-var error = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17858__$1,cljs.core.cst$kw$error);
-var value = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17858__$1,cljs.core.cst$kw$value);
+cljs.js.eval_str.cljs$core$IFn$_invoke$arity$5(quilfiddle.core.st,[cljs.core.str("(ns fiddle.runtime (:require [quil.core :as q] [quil.middleware :as m])) "),cljs.core.str(quilfiddle.core.default_code)].join(''),cljs.core.cst$sym$fiddle$runtime,new cljs.core.PersistentArrayMap(null, 4, [cljs.core.cst$kw$eval,cljs.js.js_eval,cljs.core.cst$kw$load,quilfiddle.core.load,cljs.core.cst$kw$ns,cljs.core.cst$sym$fiddle$runtime,cljs.core.cst$kw$source_DASH_map,true], null),(function (p__6310){
+var map__6311 = p__6310;
+var map__6311__$1 = ((((!((map__6311 == null)))?((((map__6311.cljs$lang$protocol_mask$partition0$ & (64))) || (map__6311.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__6311):map__6311);
+var error = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__6311__$1,cljs.core.cst$kw$error);
+var value = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__6311__$1,cljs.core.cst$kw$value);
 if(cljs.core.not(error)){
 return console.log(value);
 } else {

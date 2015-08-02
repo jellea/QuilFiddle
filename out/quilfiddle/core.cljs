@@ -62,7 +62,7 @@
 
 (defn eval [in-str]
   (cljs/eval-str st in-str 'fiddle.runtime
-                 {:eval cljs/js-eval :source-map true}
+                 {:eval cljs/js-eval :source-map true :ns 'fiddle.runtime}
                  (fn [{:keys [error value]}]
                    (if-not error
                      (js/console.log value)
@@ -95,6 +95,7 @@
 (cljs/eval-str st (str "(ns fiddle.runtime (:require [quil.core :as q] [quil.middleware :as m])) " default-code) 'fiddle.runtime
               {:eval cljs/js-eval
                :load load
+               :ns 'fiddle.runtime
                :source-map true}
               (fn [{:keys [error value]}]
                 (if-not error
